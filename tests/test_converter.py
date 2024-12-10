@@ -106,7 +106,7 @@ def test_list_ordered():
                     {
                         "#name": "para",
                         "$": {"id": "p0010", "view": "all"},
-                        "_": "Item 1",
+                        "_": "Item 1"
                     }
                 ]
             },
