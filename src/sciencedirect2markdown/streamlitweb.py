@@ -117,6 +117,9 @@ def handle_list(data, level=0):
     current_level = level
     if "$$" in data:
         for item in data["$$"]:
+            if item.get("#name") == "section-title":
+                markdown_output += handle_section_title(item)
+
             if item.get("#name") == "list-item":
                 if "$$" in item:
                     label = None
