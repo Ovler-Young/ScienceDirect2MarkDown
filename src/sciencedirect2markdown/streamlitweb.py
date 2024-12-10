@@ -138,10 +138,14 @@ def handle_list(data, level=0):
                     # Format the list item with proper indentation
                     if label and label[-1] == "." and label[:-1].isdigit():
                         # Ordered list item
-                        markdown_output += "    " * current_level + f"{label} {content}\n"
+                        markdown_output += (
+                            "    " * current_level + f"{label} {content}\n"
+                        )
                     else:
                         # Unordered list item
-                        markdown_output += "    " * current_level + f"- {label} {content}\n"
+                        markdown_output += (
+                            "    " * current_level + f"- {label} {content}\n"
+                        )
 
                     # Add any nested content
                     if nested_content:
