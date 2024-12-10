@@ -114,21 +114,22 @@ def handle_simple_para(data):
 
 def handle_list(data, level=0):
     markdown_output = ""
+    current_level = level
     if "$$" in data:
         for item in data["$$"]:
             if item.get("#name") == "list-item":
-                if "label" in item:
-                    label = item["label"]
-                    if "." in label:
-                        # Remove trailing dot for ordered lists
-                        label = label.rstrip(".")
-                        markdown_output += "  " * level + f"{label} "
-                    else:
-                        markdown_output += "  " * level + f"- {label}"
-                if "para" in item:
-                    markdown_output += handle_para(item["para"]).strip() + "\n"
                 if "$$" in item:
-                    markdown_output += handle_list(item["$$"], level + 1)
+                    for subitem in item["$$"]:
+                        if subitem.get("#name") == "label":
+                            new_label = handle_label(subitem)
+                            if new_label:
+                                new_level = len(new_label.split(".")) - 1
+                                markdown_output += "  " * current_level + "- " + new_label
+                                current_level = new_level
+                        elif subitem.get("#name") == "para":
+                            markdown_output += "  " * current_level + handle_para(subitem).strip() + "\n"
+                        else:
+                            markdown_output += "  " * current_level + handle_list(subitem, current_level)
 
             elif item.get("#name") == "section-title":
                 markdown_output += "## " + handle_label(item) + "\n\n"
