@@ -550,13 +550,17 @@ def main():
                 st.header("Markdown Output Rendered")
                 st.markdown(markdown_output, unsafe_allow_html=True)
                 with colb:
-                    # Download button
-                    st.download_button(
-                        label="Download Markdown",
-                        data=markdown_output.encode("utf-8"),
-                        file_name="converted_markdown.md",
-                        mime="text/markdown",
-                    )
+                    col1, col2 = st.columns(2, gap="small", vertical_alignment="bottom")
+                    with col1:
+                        title_input = st.text_input("Title", "converted_markdown.md", label_visibility="collapsed")
+                    with col2:
+                        # Download button
+                        st.download_button(
+                            label="Download Markdown",
+                            data=markdown_output.encode("utf-8"),
+                            file_name=title_input,
+                            mime="text/markdown",
+                        )
                     st.header("Markdown Output Raw")
                     st.markdown(f"```markdown\n{markdown_output}\n```")
 
