@@ -1,0 +1,3 @@
+[submodule "mathconverter/xsl_transpect"]
+	path = mathconverter/xsl_transpect
+	url = https://github.com/transpect/mml2tex
