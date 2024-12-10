@@ -5,7 +5,7 @@ description = "It can convert json from ScienceDirect to MarkDown with some supp
 authors = [
     {name = "Ovler", email = "ovlertheyoung@gmail.com"},
 ]
-dependencies = ["streamlit>=1.40.2", "lxml>=5.3.0"]
+dependencies = ["streamlit>=1.40.2", "lxml>=5.3.0", "pytest>=8.3.4"]
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
