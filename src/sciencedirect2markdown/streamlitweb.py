@@ -237,14 +237,15 @@ def handle_figure(data):
 
 def handle_table(data):
     markdown_output = ""
-    if "label" in data:
-        markdown_output += f"**{data['label']}**\n\n"
     caption = ""
 
     if "$$" in data:
         for item in data["$$"]:
+            if item["#name"] == "label":
+                if item["_"]:
+                    markdown_output += f"**{item["_"]}**\n\n"
             if item["#name"] == "caption":
-                caption = handle_label(item["$$"][0]["simple-para"])
+                caption = handle_caption(item).strip()
             elif item["#name"] == "tgroup":
                 markdown_output += handle_tgroup(item)
 
