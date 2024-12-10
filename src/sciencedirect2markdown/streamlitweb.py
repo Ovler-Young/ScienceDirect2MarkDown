@@ -533,37 +533,38 @@ def remove_trailing_commas(json_string):
 
 # Entry point for Streamlit app
 def main():
+    st.set_page_config(layout="wide")
     st.title("JSON to Markdown Converter for Elsevier")
 
     # Input JSON data
     json_data = st.text_area("Paste JSON data here", height=300)
 
-    if st.button("Convert to Markdown"):
-        try:
-            cleaned_json_data = remove_trailing_commas(json_data)
-            data = json.loads(cleaned_json_data)
-            markdown_output = json_to_markdown(data)
-            col1, col2 = st.columns(2)
-            with col1:
+    cola, colb = st.columns(2)
+    
+    with cola:
+        if st.button("Convert to Markdown"):
+            try:
+                cleaned_json_data = remove_trailing_commas(json_data)
+                data = json.loads(cleaned_json_data)
+                markdown_output = json_to_markdown(data)
                 st.header("Markdown Output Rendered")
                 st.markdown(markdown_output, unsafe_allow_html=True)
-            with col2:
-                st.header("Markdown Output Raw")
-                st.markdown(f"```markdown\n{markdown_output}\n```")
+                with colb:
+                    # Download button
+                    st.download_button(
+                        label="Download Markdown",
+                        data=markdown_output.encode("utf-8"),
+                        file_name="converted_markdown.md",
+                        mime="text/markdown",
+                    )
+                    st.header("Markdown Output Raw")
+                    st.markdown(f"```markdown\n{markdown_output}\n```")
 
-            # Download button
-            st.download_button(
-                label="Download Markdown",
-                data=markdown_output.encode("utf-8"),
-                file_name="converted_markdown.md",
-                mime="text/markdown",
-            )
-
-        except json.JSONDecodeError:
-            st.error("Invalid JSON format. Please check your input.")
-        except Exception as e:
-            st.error(f"An error occurred: {e.__cause__}")
-            st.exception(e)
+            except json.JSONDecodeError:
+                st.error("Invalid JSON format. Please check your input.")
+            except Exception as e:
+                st.error(f"An error occurred: {e.__cause__}")
+                st.exception(e)
 
 
 if __name__ == "__main__":
