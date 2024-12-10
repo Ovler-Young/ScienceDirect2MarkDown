@@ -483,17 +483,18 @@ def handle_textbox_body(data):
 
 def handle_inline_figure(data):
     global attachment_lookup
-    if "link" in data["$$"][0]:
-        link = data["$$"][0]["link"]
-        if "$" in link and "locator" in link["$"]:
-            locator = link["$"]["locator"]
+    if "$$" in data:
+        if data["$$"][0]["#name"] == "link":
+            link = data["$$"][0]
+            if "$" in link and "locator" in link["$"]:
+                locator = link["$"]["locator"]
 
-            # Look up the attachment-eid using the locator
-            attachment_eid = attachment_lookup.get(locator)
+                # Look up the attachment-eid using the locator
+                attachment_eid = attachment_lookup.get(locator)
 
-            if attachment_eid:
-                image_url = construct_image_url(attachment_eid)
-                return f"![]({image_url})"
+                if attachment_eid:
+                    image_url = construct_image_url(attachment_eid)
+                    return f"![]({image_url})"
     return ""
 
 
