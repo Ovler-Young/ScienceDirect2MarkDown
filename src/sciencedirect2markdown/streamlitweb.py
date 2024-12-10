@@ -229,8 +229,6 @@ def handle_math(data):
 
     mathml_content = convert_json_to_mathml(data)
 
-    print(mathml_content)
-
     latex_string = mathml2latex_yarosh(mathml_content)
 
     return f"${latex_string}$"
