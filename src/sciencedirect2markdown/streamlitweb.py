@@ -4,6 +4,7 @@ from lxml import etree
 
 import streamlit as st
 
+attachment_lookup = {}
 
 def json_to_markdown(data):
     """
@@ -16,6 +17,14 @@ def json_to_markdown(data):
         The Markdown string.
     """
     markdown_output = ""
+
+    # Create a lookup dictionary for attachment-eid based on file-basename
+    if "attachments" in data:
+        for attachment in data["attachments"]:
+            if "file-basename" in attachment and "attachment-eid" in attachment:
+                attachment_lookup[attachment["file-basename"]] = attachment[
+                    "attachment-eid"
+                ]
 
     if isinstance(data, dict):
         if "#name" in data:
@@ -60,7 +69,7 @@ def json_to_markdown(data):
             elif tag_name == "textbox-body":
                 markdown_output += handle_textbox_body(data)
             elif tag_name == "inline-figure":
-                markdown_output += handle_inline_figure(data)
+                markdown_output += handle_inline_figure(data, attachment_lookup)
             elif tag_name == "link":
                 markdown_output += handle_link(data)
             elif tag_name == "__text__":
@@ -75,8 +84,8 @@ def json_to_markdown(data):
             markdown_output += json_to_markdown(data["content"])
         elif "floats" in data:
             markdown_output += json_to_markdown(data["floats"])
-        elif "attachments" in data:
-            markdown_output += json_to_markdown(data["attachments"])
+        # elif "attachments" in data:
+        #     markdown_output += json_to_markdown(data["attachments"])
 
     elif isinstance(data, list):
         for item in data:
@@ -443,7 +452,7 @@ def handle_inline_figure(data, attachment_lookup):
 
                 if attachment_eid:
                     image_url = construct_image_url(attachment_eid)
-            return f"![]({image_url})"
+                    return f"![]({image_url})"
     return ""
 
 
