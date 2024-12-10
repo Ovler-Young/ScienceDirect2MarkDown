@@ -5,6 +5,7 @@ from lxml import etree
 import streamlit as st
 
 attachment_lookup = {}
+floats = {}
 
 
 def json_to_markdown(data):
@@ -32,6 +33,13 @@ def json_to_markdown(data):
                         and attachment["attachment-type"] != "IMAGE-THUMBNAIL"
                     ):
                         attachment_lookup[file_basename] = attachment["attachment-eid"]
+
+    # float
+    if "floats" in data:
+        for float_item in data["floats"]:
+            if "$" in float_item and "id" in float_item["$"]:
+                float_id = float_item["$"]["id"]
+                floats[float_id] = float_item
 
     if isinstance(data, dict):
         if "#name" in data:
