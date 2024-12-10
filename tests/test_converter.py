@@ -18,7 +18,7 @@ def test_basic_paragraph():
     json_data = {
         "#name": "para",
         "$": {"id": "p0010", "view": "all"},
-        "_": "This is a paragraph.",
+        "_": "This is a paragraph."
     }
     expected_markdown = "This is a paragraph.\n\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -32,9 +32,9 @@ def test_paragraph_with_child():
         "$$": [
             {
                 "#name": "bold",
-                "_": "bold text",
+                "_": "bold text"
             }
-        ],
+        ]
     }
     expected_markdown = "This is a paragraph with **bold text**\n\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -49,9 +49,9 @@ def test_nested_paragraph():
             {
                 "#name": "para",
                 "$": {"id": "p0011", "view": "all"},
-                "_": "This is a nested paragraph.",
+                "_": "This is a nested paragraph."
             }
-        ],
+        ]
     }
     expected_markdown = "This is a paragraph.\n\nThis is a nested paragraph.\n\n"
     print(json_to_markdown(json_data))
@@ -71,9 +71,9 @@ def test_list_unordered():
                     {
                         "#name": "para",
                         "$": {"id": "p0010", "view": "all"},
-                        "_": "Item 1",
-                    },
-                ],
+                        "_": "Item 1"
+                    }
+                ]
             },
             {
                 "#name": "list-item",
@@ -83,11 +83,11 @@ def test_list_unordered():
                     {
                         "#name": "para",
                         "$": {"id": "p0020", "view": "all"},
-                        "_": "Item 2",
-                    },
-                ],
-            },
-        ],
+                        "_": "Item 2"
+                    }
+                ]
+            }
+        ]
     }
     expected_markdown = "- •Item 1\n- •Item 2\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -107,8 +107,8 @@ def test_list_ordered():
                         "#name": "para",
                         "$": {"id": "p0010", "view": "all"},
                         "_": "Item 1",
-                    },
-                ],
+                    }
+                ]
             },
             {
                 "#name": "list-item",
@@ -118,11 +118,11 @@ def test_list_ordered():
                     {
                         "#name": "para",
                         "$": {"id": "p0020", "view": "all"},
-                        "_": "Item 2",
-                    },
-                ],
-            },
-        ],
+                        "_": "Item 2"
+                    }
+                ]
+            }
+        ]
     }
     expected_markdown = "1 Item 1\n2 Item 2\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -141,9 +141,9 @@ def test_list_mixed():
                     {
                         "#name": "para",
                         "$": {"id": "p0010", "view": "all"},
-                        "_": "Item 1",
-                    },
-                ],
+                        "_": "Item 1"
+                    }
+                ]
             },
             {
                 "#name": "list-item",
@@ -153,11 +153,11 @@ def test_list_mixed():
                     {
                         "#name": "para",
                         "$": {"id": "p0020", "view": "all"},
-                        "_": "Item 2",
-                    },
-                ],
-            },
-        ],
+                        "_": "Item 2"
+                    }
+                ]
+            }
+        ]
     }
     expected_markdown = "1 Item 1\n- •Item 2\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -176,7 +176,7 @@ def test_nested_list():
                     {
                         "#name": "para",
                         "$": {"id": "p0010", "view": "all"},
-                        "_": "Item 1",
+                        "_": "Item 1"
                     },
                     {
                         "#name": "list",
@@ -191,17 +191,17 @@ def test_nested_list():
                                         "#name": "para",
                                         "$": {
                                             "id": "p0020",
-                                            "view": "all",
+                                            "view": "all"
                                         },
-                                        "_": "Nested Item 1",
-                                    },
-                                ],
+                                        "_": "Nested Item 1"
+                                    }
+                                ]
                             }
-                        ],
-                    },
-                ],
+                        ]
+                    }
+                ]
             }
-        ],
+        ]
     }
     expected_markdown = "1 Item 1\n  - •Nested Item 1\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -213,17 +213,17 @@ def test_simple_math():
         "$$": [
             {
                 "#name": "mi",
-                "_": "x",
+                "_": "x"
             },
             {
                 "#name": "mo",
-                "_": "+",
+                "_": "+"
             },
             {
                 "#name": "mn",
-                "_": "1",
-            },
-        ],
+                "_": "1"
+            }
+        ]
     }
 
     expected_mathml = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>+</mo><mn>1</mn></math>'
@@ -246,15 +246,15 @@ def test_complex_math():
                         "$": {"accent": "true"},
                         "$$": [
                             {"#name": "mi", "_": "W"},
-                            {"#name": "mo", "$": {"stretchy": "false"}, "_": "."},
-                        ],
+                            {"#name": "mo", "$": {"stretchy": "false"}, "_": "."}
+                        ]
                     },
-                    {"#name": "mi", "$": {"mathvariant": "normal"}, "_": "s"},
-                ],
+                    {"#name": "mi", "$": {"mathvariant": "normal"}, "_": "s"}
+                ]
             },
             {"#name": "mo", "_": "≤"},
-            {"#name": "mn", "_": "0"},
-        ],
+            {"#name": "mn", "_": "0"}
+        ]
     }
 
     expected_mathml = '<math xmlns="http://www.w3.org/1998/Math/MathML" altimg="si21.gif" overflow="scroll"><msub><mover accent="true"><mi>W</mi><mo stretchy="false">.</mo></mover><mi mathvariant="normal">s</mi></msub><mo>≤</mo><mn>0</mn></math>'
@@ -281,18 +281,18 @@ def test_simple_figure():
                 "$$": [
                     {
                         "#name": "simple-para",
-                        "_": "This is a figure caption.",
+                        "_": "This is a figure caption."
                     }
-                ],
+                ]
             },
             {
                 "#name": "link",
                 "$": {
                     "locator": "3-s2.0-B9780444637833000186-f18-01-9780444637833.gif",
-                    "id": "lk0010",
-                },
-            },
-        ],
+                    "id": "lk0010"
+                }
+            }
+        ]
     }
 
     expected_markdown = (
@@ -308,7 +308,7 @@ def test_handle_href_in_links():
     json_data_http = {
         "#name": "inter-ref",
         "$": {"href": "http://www.example.com", "id": "ir0010"},
-        "_": "Link",
+        "_": "Link"
     }
     expected_markdown_http = "[Link](http://www.example.com)"
     assert handle_inter_ref(json_data_http) == expected_markdown_http
@@ -317,7 +317,7 @@ def test_handle_href_in_links():
     json_data_pii = {
         "#name": "intra-ref",
         "$": {"href": "pii:B978-0-444-63783-3.00012-5", "id": "ia0010"},
-        "_": "Chapter 12",
+        "_": "Chapter 12"
     }
     expected_markdown_pii = "[Chapter 12](https://www.sciencedirect.com/science/article/pii/B9780444637833000125)"
     assert handle_intra_ref(json_data_pii) == expected_markdown_pii
@@ -331,7 +331,7 @@ def test_handle_table():
             {"#name": "label", "_": "Table 1"},
             {
                 "#name": "caption",
-                "$$": [{"#name": "simple-para", "_": "Table Caption"}],
+                "$$": [{"#name": "simple-para", "_": "Table Caption"}]
             },
             {
                 "#name": "tgroup",
@@ -346,10 +346,10 @@ def test_handle_table():
                                 "#name": "row",
                                 "$$": [
                                     {"#name": "entry", "_": "Header 1"},
-                                    {"#name": "entry", "_": "Header 2"},
-                                ],
+                                    {"#name": "entry", "_": "Header 2"}
+                                ]
                             }
-                        ],
+                        ]
                     },
                     {
                         "#name": "tbody",
@@ -358,21 +358,21 @@ def test_handle_table():
                                 "#name": "row",
                                 "$$": [
                                     {"#name": "entry", "_": "Row 1, Cell 1"},
-                                    {"#name": "entry", "_": "Row 1, Cell 2"},
-                                ],
+                                    {"#name": "entry", "_": "Row 1, Cell 2"}
+                                ]
                             },
                             {
                                 "#name": "row",
                                 "$$": [
                                     {"#name": "entry", "_": "Row 2, Cell 1"},
-                                    {"#name": "entry", "_": "Row 2, Cell 2"},
-                                ],
-                            },
-                        ],
-                    },
-                ],
-            },
-        ],
+                                    {"#name": "entry", "_": "Row 2, Cell 2"}
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
     }
     expected_markdown = (
         "**Table 1**\n\n"
@@ -397,22 +397,22 @@ def test_outline():
                         "#name": "list-item",
                         "$$": [
                             {"#name": "label", "_": "1."},
-                            {"#name": "para", "_": "First outline"},
-                        ],
+                            {"#name": "para", "_": "First outline"}
+                        ]
                     },
                     {
                         "#name": "list-item",
                         "$$": [
                             {"#name": "label", "_": "2."},
-                            {"#name": "para", "_": "Second outline"},
-                        ],
-                    },
-                ],
+                            {"#name": "para", "_": "Second outline"}
+                        ]
+                    }
+                ]
             }
-        ],
+        ]
     }
 
-    expected_markdown = "## Outline\n\n1 First outline\n2 Second outline\n"
+    expected_markdown = "## Outline\n\n1. First outline\n2. Second outline\n"
     assert handle_outline(json_data) == expected_markdown
 
 
@@ -423,9 +423,9 @@ def test_basic_sections():
             {
                 "#name": "para",
                 "$": {"id": "p0190", "view": "all"},
-                "_": "What is reactivity hazard? ",
-            },
-        ],
+                "_": "What is reactivity hazard? "
+            }
+        ]
     }
     expected_markdown = "What is reactivity hazard? \n\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -445,13 +445,13 @@ def test_complex_sections():
             "xmlns:xsi": True,
             "xmlns:cals": True,
             "xmlns:sb": True,
-            "xmlns": True,
+            "xmlns": True
         },
         "$$": [
             {
                 "#name": "para",
                 "$": {"id": "p0190", "view": "all"},
-                "_": "What is reactivity hazard? ",
+                "_": "What is reactivity hazard? "
             },
             {
                 "#name": "para",
@@ -459,16 +459,16 @@ def test_complex_sections():
                 "$$": [
                     {
                         "#name": "__text__",
-                        "_": "A significant aspect of bioprocess engineering is considering how accidents could occur in biological and chemical processes in order to anticipate all possible modes by which the system might malfunction. This optimum design goal is discussed throughout this text, for example, see ",
+                        "_": "A significant aspect of bioprocess engineering is considering how accidents could occur in biological and chemical processes in order to anticipate all possible modes by which the system might malfunction. This optimum design goal is discussed throughout this text, for example, see "
                     },
                     {
                         "#name": "intra-ref",
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00003-4",
                             "id": "ia0010",
-                            "type": "simple",
+                            "type": "simple"
                         },
-                        "_": "Chapters 3",
+                        "_": "Chapters 3"
                     },
                     {"#name": "__text__", "_": ", "},
                     {
@@ -476,9 +476,9 @@ def test_complex_sections():
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00004-6",
                             "id": "ia0015",
-                            "type": "simple",
+                            "type": "simple"
                         },
-                        "_": "4",
+                        "_": "4"
                     },
                     {"#name": "__text__", "_": ", "},
                     {
@@ -486,9 +486,9 @@ def test_complex_sections():
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00005-8",
                             "id": "ia0020",
-                            "type": "simple",
+                            "type": "simple"
                         },
-                        "_": "5",
+                        "_": "5"
                     },
                     {"#name": "__text__", "_": ", and "},
                     {
@@ -496,30 +496,30 @@ def test_complex_sections():
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00017-4",
                             "id": "ia0045",
-                            "type": "simple",
+                            "type": "simple"
                         },
-                        "_": "17",
+                        "_": "17"
                     },
                     {
                         "#name": "__text__",
-                        "_": ". However, we also need to consider whether that design is sufficiently robust that it will be stable in any unforeseen situations that may arise. Stability and sustainability of the reactor system of bioprocess are discussed in ",
+                        "_": ". However, we also need to consider whether that design is sufficiently robust that it will be stable in any unforeseen situations that may arise. Stability and sustainability of the reactor system of bioprocess are discussed in "
                     },
                     {
                         "#name": "intra-ref",
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00015-0",
                             "id": "ia0050",
-                            "type": "simple",
+                            "type": "simple"
                         },
-                        "_": "Chapter 15",
+                        "_": "Chapter 15"
                     },
                     {
                         "#name": "__text__",
-                        "_": ". We need also to examine operating modes outside of the regime of optimal design and assure that for all possible situations in which the system may be operated, uncontrollable consequences will not occur. Chain reactions and/or uncontrolled combustion/explosion are often associated with accidents. We will discuss this subject and its application in industry, as well.",
-                    },
-                ],
-            },
-        ],
+                        "_": ". We need also to examine operating modes outside of the regime of optimal design and assure that for all possible situations in which the system may be operated, uncontrollable consequences will not occur. Chain reactions and/or uncontrolled combustion/explosion are often associated with accidents. We will discuss this subject and its application in industry, as well."
+                    }
+                ]
+            }
+        ]
     }
     expected_markdown = "What is reactivity hazard? \n\nA significant aspect of bioprocess engineering is considering how accidents could occur in biological and chemical processes in order to anticipate all possible modes by which the system might malfunction. This optimum design goal is discussed throughout this text, for example, see [Chapters 3](https://www.sciencedirect.com/science/article/pii/B9780444637833000034), [4](https://www.sciencedirect.com/science/article/pii/B9780444637833000046), [5](https://www.sciencedirect.com/science/article/pii/B9780444637833000058), and [17](https://www.sciencedirect.com/science/article/pii/B9780444637833000174). However, we also need to consider whether that design is sufficiently robust that it will be stable in any unforeseen situations that may arise. Stability and sustainability of the reactor system of bioprocess are discussed in [Chapter 15](https://www.sciencedirect.com/science/article/pii/B9780444637833000150). We need also to examine operating modes outside of the regime of optimal design and assure that for all possible situations in which the system may be operated, uncontrollable consequences will not occur. Chain reactions and/or uncontrolled combustion/explosion are often associated with accidents. We will discuss this subject and its application in industry, as well.\n\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -544,7 +544,7 @@ def test_handle_attachments():
                 "filesize": "21318",
                 "pixel-height": "357",
                 "pixel-width": "344",
-                "attachment-type": "IMAGE-DOWNSAMPLED",
+                "attachment-type": "IMAGE-DOWNSAMPLED"
             },
             {
                 "attachment-eid": "3-s2.0-B9780444637833000186-f18-01-9780444637833.sml",
@@ -555,8 +555,8 @@ def test_handle_attachments():
                 "filesize": "6860",
                 "pixel-height": "164",
                 "pixel-width": "158",
-                "attachment-type": "IMAGE-THUMBNAIL",
-            },
+                "attachment-type": "IMAGE-THUMBNAIL"
+            }
         ]
     }
     # For now, we expect attachments to be handled based on their usage in the content
@@ -582,7 +582,7 @@ def test_handle_affiliations():
 def test_missing_name():
     json_data = {
         "$": {"id": "p0010", "view": "all"},
-        "_": "Missing name.",
+        "_": "Missing name."
     }
     expected_markdown = "Missing name.\n\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -591,7 +591,7 @@ def test_missing_name():
 def test_missing_attributes():
     json_data = {
         "#name": "para",
-        "_": "Missing attributes.",
+        "_": "Missing attributes."
     }
     expected_markdown = "Missing attributes.\n\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -600,7 +600,7 @@ def test_missing_attributes():
 def test_missing_text():
     json_data = {
         "#name": "para",
-        "$": {"id": "p0010", "view": "all"},
+        "$": {"id": "p0010", "view": "all"}
     }
     expected_markdown = "\n\n"
     assert json_to_markdown(json_data) == expected_markdown
@@ -610,7 +610,7 @@ def test_empty_list():
     json_data = {
         "#name": "list",
         "$": {"id": "l0010"},
-        "$$": [],
+        "$$": []
     }
     expected_markdown = ""
     assert json_to_markdown(json_data) == expected_markdown
@@ -620,9 +620,9 @@ def test_empty_table():
     json_data = {
         "#name": "table",
         "$": {"id": "t0010"},
-        "$$": [],
+        "$$": []
     }
-    expected_markdown = "\n\n"
+    expected_markdown = ""
     assert json_to_markdown(json_data) == expected_markdown
 
 
