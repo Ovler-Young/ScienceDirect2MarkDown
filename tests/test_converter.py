@@ -226,7 +226,7 @@ def test_simple_math():
         ],
     }
 
-    expected_mathml = "<math><mi>x</mi><mo>+</mo><mn>1</mn></math>"
+    expected_mathml = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>+</mo><mn>1</mn></math>'
     assert convert_json_to_mathml(json_data) == expected_mathml
 
     expected_markdown = "$x + 1$"
@@ -257,10 +257,10 @@ def test_complex_math():
         ],
     }
 
-    expected_mathml = '<math altimg="si21.gif" overflow="scroll"><msub><mover accent="true"><mi>W</mi><mo stretchy="false">.</mo></mover><mi mathvariant="normal">s</mi></msub><mo>≤</mo><mn>0</mn></math>'
+    expected_mathml = '<math xmlns="http://www.w3.org/1998/Math/MathML" altimg="si21.gif" overflow="scroll"><msub><mover accent="true"><mi>W</mi><mo stretchy="false">.</mo></mover><mi mathvariant="normal">s</mi></msub><mo>≤</mo><mn>0</mn></math>'
     assert convert_json_to_mathml(json_data) == expected_mathml
 
-    expected_markdown = "$\\dot{W}_{s} \\le 0$"
+    expected_markdown = "$$ {\\stackrel{.}{W}}_{\\mathrm{s}}\\le 0$$"
     assert handle_math(json_data) == expected_markdown
 
 
@@ -319,7 +319,7 @@ def test_handle_href_in_links():
         "$": {"href": "pii:B978-0-444-63783-3.00012-5", "id": "ia0010"},
         "_": "Chapter 12",
     }
-    expected_markdown_pii = "[Chapter 12](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00012/5)"
+    expected_markdown_pii = "[Chapter 12](https://www.sciencedirect.com/science/article/pii/B9780444637833000125)"
     assert handle_intra_ref(json_data_pii) == expected_markdown_pii
 
 
@@ -521,7 +521,7 @@ def test_complex_sections():
             },
         ],
     }
-    expected_markdown = "What is reactivity hazard? \n\nA significant aspect of bioprocess engineering is considering how accidents could occur in biological and chemical processes in order to anticipate all possible modes by which the system might malfunction. This optimum design goal is discussed throughout this text, for example, see [Chapters 3](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00003/4), [4](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00004/6), [5](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00005/8), and [17](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00017/4). However, we also need to consider whether that design is sufficiently robust that it will be stable in any unforeseen situations that may arise. Stability and sustainability of the reactor system of bioprocess are discussed in [Chapter 15](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00015/0). We need also to examine operating modes outside of the regime of optimal design and assure that for all possible situations in which the system may be operated, uncontrollable consequences will not occur. Chain reactions and/or uncontrolled combustion/explosion are often associated with accidents. We will discuss this subject and its application in industry, as well.\n\n"
+    expected_markdown = "What is reactivity hazard? \n\nA significant aspect of bioprocess engineering is considering how accidents could occur in biological and chemical processes in order to anticipate all possible modes by which the system might malfunction. This optimum design goal is discussed throughout this text, for example, see [Chapters 3](https://www.sciencedirect.com/science/article/pii/B9780444637833000034), [4](https://www.sciencedirect.com/science/article/pii/B9780444637833000046), [5](https://www.sciencedirect.com/science/article/pii/B9780444637833000058), and [17](https://www.sciencedirect.com/science/article/pii/B9780444637833000174). However, we also need to consider whether that design is sufficiently robust that it will be stable in any unforeseen situations that may arise. Stability and sustainability of the reactor system of bioprocess are discussed in [Chapter 15](https://www.sciencedirect.com/science/article/pii/B9780444637833000150). We need also to examine operating modes outside of the regime of optimal design and assure that for all possible situations in which the system may be operated, uncontrollable consequences will not occur. Chain reactions and/or uncontrolled combustion/explosion are often associated with accidents. We will discuss this subject and its application in industry, as well.\n\n"
     assert json_to_markdown(json_data) == expected_markdown
 
 
