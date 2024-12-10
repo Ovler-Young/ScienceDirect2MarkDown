@@ -112,43 +112,41 @@ def handle_simple_para(data):
     return markdown_output
 
 
-def handle_list(data, level=0): 
+def handle_list(data, level=0):
     markdown_output = ""
     current_level = level
-    if level > 0:
-        print("Level:", level)
     if "$$" in data:
         for item in data["$$"]:
             if item.get("#name") == "list-item":
                 if "$$" in item:
                     label = None
                     content = None
-                    
-                    # First pass - get the label and para content
+                    nested_content = ""
+
+                    # First pass - get label, content and nested lists
                     for subitem in item["$$"]:
                         if subitem.get("#name") == "label":
                             label = handle_label(subitem)
                         elif subitem.get("#name") == "para":
                             content = handle_para(subitem).strip()
-                    
-                    # Handle ordered vs unordered list items        
-                    if label and label[-1] == '.' and label[:-1].isdigit():
-                        # Ordered list
-                        markdown_output += "  " * current_level + f"{label} {content}\n" 
-                    else:
-                        # Unordered list
-                        markdown_output += "  " * current_level + f"- {content}\n"
-                        
-                    # Second pass - handle nested lists and other content
-                    for subitem in item["$$"]:
-                        if subitem.get("#name") not in ["label", "para"]:
-                            markdown_output += "  " * current_level + handle_list(subitem, current_level)
+                        elif subitem.get("#name") == "list":
+                            nested_content = handle_list(subitem, current_level + 1)
 
-            elif item.get("#name") == "section-title":
-                markdown_output += "## " + handle_label(item) + "\n\n"
+                    # Format the list item with proper indentation
+                    if label and label[-1] == "." and label[:-1].isdigit():
+                        # Ordered list item
+                        markdown_output += "    " * current_level + f"{label} {content}\n"
+                    else:
+                        # Unordered list item
+                        markdown_output += "    " * current_level + f"- {label} {content}\n"
+
+                    # Add any nested content
+                    if nested_content:
+                        markdown_output += nested_content
+
             elif item.get("#name") == "list":
                 markdown_output += handle_list(item, level + 1)
-                
+
     return markdown_output
 
 
@@ -476,7 +474,7 @@ def main():
                 st.markdown(markdown_output, unsafe_allow_html=True)
             with col2:
                 st.header("Markdown Output Raw")
-                st.text(markdown_output)
+                st.markdown(f"```markdown\n{markdown_output}\n```")
 
             # Download button
             st.download_button(
