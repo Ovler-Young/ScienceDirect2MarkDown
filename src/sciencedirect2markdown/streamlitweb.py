@@ -6,6 +6,7 @@ import streamlit as st
 
 attachment_lookup = {}
 floats = {}
+processed_floats = set()
 
 
 def json_to_markdown(data):
@@ -18,7 +19,12 @@ def json_to_markdown(data):
     Returns:
         The Markdown string.
     """
+    global attachment_lookup
+    global floats
+    global processed_floats
+
     markdown_output = ""
+    processed_floats = set()
 
     # Create a lookup dictionary for attachment-eid based on file-basename
     if "attachments" in data:
@@ -117,12 +123,27 @@ def handle_sections(data):
 
 
 def handle_para(data):
+    global processed_floats
     markdown_output = ""
+    float_content = ""
     if "_" in data:
         markdown_output += handle_label(data)
     if "$$" in data:
-        markdown_output += json_to_markdown(data["$$"])
-    markdown_output += "\n\n"
+        for item in data["$$"]:
+            if item["#name"] == "float-anchor":
+                float_id = item["$"]["refid"]
+                if float_id not in processed_floats:
+                    if float_id in floats:
+                        float_data = floats[float_id]
+                        if float_data["#name"] == "figure":
+                            float_content += handle_figure(float_data)
+                        elif float_data["#name"] == "table":
+                            float_content += handle_table(float_data)
+                        processed_floats.add(float_id)
+            else:
+                markdown_output += json_to_markdown(item)
+
+    markdown_output += "\n\n" + float_content
     return markdown_output
 
 
@@ -255,26 +276,30 @@ def convert_json_to_mathml(data):
 
 
 def handle_figure(data):
+    global attachment_lookup
     markdown_output = ""
     caption = ""
     image_url = ""
-
-    if "label" in data:
-        markdown_output += f"**{data['label']}**\n\n"
+    label = ""
 
     if "$$" in data:
         for item in data["$$"]:
+            if item["#name"] == "label":
+                label = handle_label(item)
             if item["#name"] == "caption":
-                if "simple-para" in item["$$"][0]:
-                    caption = handle_label(item["$$"][0]["simple-para"])
+                caption = handle_caption(item).strip()
             elif item["#name"] == "link":
                 if "$" in item and "locator" in item["$"]:
-                    image_url = construct_image_url(item["$"]["locator"])
+                    locator = item["$"]["locator"]
+                    attachment_eid = attachment_lookup.get(locator)
+                    if attachment_eid:
+                        image_url = construct_image_url(attachment_eid)
 
     if image_url:
-        markdown_output += f"![{caption}]({image_url})\n\n"
-    if caption:
-        markdown_output += f"*{caption}*\n\n"
+        markdown_output += f"![{label + "." if label else ''}{' ' + caption if caption else ''}]({image_url})\n\n"
+        markdown_output += (
+            f"*{label + "." if label else ''}{' ' + caption if caption else ''}*\n\n"
+        )
 
     return markdown_output
 
@@ -456,17 +481,18 @@ def handle_textbox_body(data):
 
 
 def handle_inline_figure(data):
-    for item in data["$$"]:
-        if item["#name"] == "link":
-            if "$" in item and "locator" in item["$"]:
-                locator = item["$"]["locator"]
+    global attachment_lookup
+    if "link" in data["$$"][0]:
+        link = data["$$"][0]["link"]
+        if "$" in link and "locator" in link["$"]:
+            locator = link["$"]["locator"]
 
-                # Look up the attachment-eid using the locator
-                attachment_eid = attachment_lookup.get(locator)
+            # Look up the attachment-eid using the locator
+            attachment_eid = attachment_lookup.get(locator)
 
-                if attachment_eid:
-                    image_url = construct_image_url(attachment_eid)
-                    return f"![]({image_url})"
+            if attachment_eid:
+                image_url = construct_image_url(attachment_eid)
+                return f"![]({image_url})"
     return ""
 
 
