@@ -431,11 +431,18 @@ def handle_textbox_body(data):
     return markdown_output
 
 
-def handle_inline_figure(data):
-    if "link" in data["$$"][0]:
-        link = data["$$"][0]["link"]
-        if "locator" in link["$"]:
-            image_url = construct_image_url(link["$"]["locator"])
+def handle_inline_figure(data, attachment_lookup):
+    for item in data["$$"]:
+        print(item)
+        if item["#name"] == "link":
+            if "$" in item and "locator" in item["$"]:
+                locator = item["$"]["locator"]
+
+                # Look up the attachment-eid using the locator
+                attachment_eid = attachment_lookup.get(locator)
+
+                if attachment_eid:
+                    image_url = construct_image_url(attachment_eid)
             return f"![]({image_url})"
     return ""
 
