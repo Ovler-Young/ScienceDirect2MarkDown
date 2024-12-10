@@ -6,6 +6,7 @@ import streamlit as st
 
 attachment_lookup = {}
 
+
 def json_to_markdown(data):
     """
     Converts the given JSON data to Markdown.
@@ -22,9 +23,15 @@ def json_to_markdown(data):
     if "attachments" in data:
         for attachment in data["attachments"]:
             if "file-basename" in attachment and "attachment-eid" in attachment:
-                attachment_lookup[attachment["file-basename"]] = attachment[
-                    "attachment-eid"
-                ]
+                file_basename = attachment["file-basename"]
+                if file_basename not in attachment_lookup:
+                    attachment_lookup[file_basename] = attachment["attachment-eid"]
+                else:
+                    if (
+                        "attachment-type" in attachment
+                        and attachment["attachment-type"] != "IMAGE-THUMBNAIL"
+                    ):
+                        attachment_lookup[file_basename] = attachment["attachment-eid"]
 
     if isinstance(data, dict):
         if "#name" in data:
@@ -442,7 +449,6 @@ def handle_textbox_body(data):
 
 def handle_inline_figure(data, attachment_lookup):
     for item in data["$$"]:
-        print(item)
         if item["#name"] == "link":
             if "$" in item and "locator" in item["$"]:
                 locator = item["$"]["locator"]
