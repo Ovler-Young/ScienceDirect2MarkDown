@@ -5,7 +5,6 @@ from lxml import etree
 import streamlit as st
 
 
-
 def json_to_markdown(data):
     """
     Converts the given JSON data to Markdown.
@@ -85,11 +84,13 @@ def json_to_markdown(data):
 
     return markdown_output
 
+
 def handle_sections(data):
     markdown_output = ""
     if "$$" in data:
         markdown_output += json_to_markdown(data["$$"])
     return markdown_output
+
 
 def handle_para(data):
     markdown_output = ""
@@ -100,6 +101,7 @@ def handle_para(data):
     markdown_output += "\n\n"
     return markdown_output
 
+
 def handle_simple_para(data):
     markdown_output = ""
     if "_" in data:
@@ -108,6 +110,7 @@ def handle_simple_para(data):
         markdown_output += json_to_markdown(data["$$"])
     markdown_output += "\n\n"
     return markdown_output
+
 
 def handle_list(data, level=0):
     markdown_output = ""
@@ -133,30 +136,33 @@ def handle_list(data, level=0):
                 markdown_output += handle_list(item, level + 1)
     return markdown_output
 
+
 def mathml2latex_yarosh(equation):
-    """ MathML to LaTeX conversion with XSLT from Vasil Yaroshevich """
-    xslt_file = os.path.join('mathconverter', 'xsl_yarosh', 'mmltex.xsl')
+    """MathML to LaTeX conversion with XSLT from Vasil Yaroshevich"""
+    xslt_file = os.path.join("mathconverter", "xsl_yarosh", "mmltex.xsl")
     dom = etree.fromstring(equation)
     xslt = etree.parse(xslt_file)
     transform = etree.XSLT(xslt)
     newdom = transform(dom)
     return newdom
 
+
 def mathml2latex_transpect(equation):
-    """ MathML to LaTeX conversion with XSLT from Transpect """
-    xslt_file = os.path.join('mathconverter', 'xsl_transpect', 'xsl', 'mml2tex.xsl')
+    """MathML to LaTeX conversion with XSLT from Transpect"""
+    xslt_file = os.path.join("mathconverter", "xsl_transpect", "xsl", "mml2tex.xsl")
     dom = etree.fromstring(equation)
     xslt = etree.parse(xslt_file)
     transform = etree.XSLT(xslt)
     newdom = transform(dom)
     return newdom
+
 
 def handle_math(data):
     if not ("$$" in data and isinstance(data["$$"], list)):
         return ""
 
     mathml_content = convert_json_to_mathml(data)
-    
+
     print(mathml_content)
 
     latex_string = mathml2latex_yarosh(mathml_content)
@@ -202,6 +208,7 @@ def convert_json_to_mathml(data):
     else:
         return str(data)
 
+
 def handle_figure(data):
     markdown_output = ""
     caption = ""
@@ -226,6 +233,7 @@ def handle_figure(data):
 
     return markdown_output
 
+
 def handle_table(data):
     markdown_output = ""
     if "label" in data:
@@ -242,6 +250,7 @@ def handle_table(data):
     if caption:
         markdown_output += f"*{caption}*\n\n"
     return markdown_output
+
 
 def handle_tgroup(data):
     markdown_output = ""
@@ -281,6 +290,7 @@ def handle_tgroup(data):
     markdown_output += "\n"
     return markdown_output
 
+
 def handle_thead(data):
     header = []
     if "$$" in data:
@@ -298,6 +308,7 @@ def handle_thead(data):
     # Flatten the header list
     return header[0] if header else []
 
+
 def handle_tbody(data):
     rows = []
     if "$$" in data:
@@ -314,6 +325,7 @@ def handle_tbody(data):
                 rows.append(row_data)
     return rows
 
+
 def handle_outline(data):
     markdown_output = ""
     if "$$" in data:
@@ -322,19 +334,24 @@ def handle_outline(data):
                 markdown_output += handle_list(item)
     return markdown_output
 
+
 def handle_section_title(data):
     return "## " + handle_label(data) + "\n\n"
+
 
 def handle_bold(data):
     return f"**{handle_label(data)}**"
 
+
 def handle_italic(data):
     return f"*{handle_label(data)}*"
+
 
 def handle_label(data):
     if "_" in data:
         return data["_"]
     return ""
+
 
 def handle_cross_ref(data):
     if "refid" in data["$"]:
@@ -342,11 +359,13 @@ def handle_cross_ref(data):
         return f"[{handle_label(data)}](#{refid})"
     return handle_label(data) if "_" in data else ""
 
+
 def handle_inter_ref(data):
     if "href" in data["$"]:
         href = data["$"]["href"]
         return f"[{handle_label(data) if '_' in data else ''}]({href})"
     return handle_label(data) if "_" in data else ""
+
 
 def handle_intra_ref(data):
     if "href" in data["$"]:
@@ -359,11 +378,13 @@ def handle_intra_ref(data):
         return f"[{handle_label(data) if '_' in data else ''}]({modified_href})"
     return handle_label(data) if "_" in data else ""
 
+
 def handle_display(data):
     markdown_output = ""
     if "$$" in data:
         markdown_output += json_to_markdown(data["$$"])
     return markdown_output
+
 
 def handle_textbox(data):
     markdown_output = ""
@@ -371,17 +392,20 @@ def handle_textbox(data):
         markdown_output += json_to_markdown(data["$$"])
     return markdown_output
 
+
 def handle_caption(data):
     markdown_output = ""
     if "$$" in data:
         markdown_output += json_to_markdown(data["$$"])
     return markdown_output
 
+
 def handle_textbox_body(data):
     markdown_output = ""
     if "$$" in data:
         markdown_output += json_to_markdown(data["$$"])
     return markdown_output
+
 
 def handle_inline_figure(data):
     if "link" in data["$$"][0]:
@@ -391,14 +415,17 @@ def handle_inline_figure(data):
             return f"![]({image_url})"
     return ""
 
+
 def handle_link(data):
     if "locator" in data["$"]:
         image_url = construct_image_url(data["$"]["locator"])
         return f"![]({image_url})"
     return ""
 
+
 def handle_text(data):
     return handle_label(data)
+
 
 def construct_image_url(locator):
     """
@@ -411,6 +438,7 @@ def construct_image_url(locator):
         The constructed image URL.
     """
     return f"https://ars.els-cdn.com/content/image/{locator}"
+
 
 # Entry point for Streamlit app
 def main():
@@ -444,7 +472,7 @@ def main():
         except Exception as e:
             st.error(f"An error occurred: {e.__cause__}")
             st.exception(e)
-            
+
 
 if __name__ == "__main__":
     main()

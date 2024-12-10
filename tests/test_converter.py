@@ -1,8 +1,18 @@
 import pytest
-from sciencedirect2markdown.streamlitweb import json_to_markdown, handle_math, handle_inter_ref, handle_intra_ref, handle_outline, convert_json_to_mathml, construct_image_url
+from sciencedirect2markdown.streamlitweb import (
+    json_to_markdown,
+    handle_math,
+    handle_inter_ref,
+    handle_intra_ref,
+    handle_outline,
+    convert_json_to_mathml,
+    construct_image_url,
+)
+
 
 def test_empty_input():
     assert json_to_markdown({}) == ""
+
 
 def test_basic_paragraph():
     json_data = {
@@ -12,6 +22,7 @@ def test_basic_paragraph():
     }
     expected_markdown = "This is a paragraph.\n\n"
     assert json_to_markdown(json_data) == expected_markdown
+
 
 def test_paragraph_with_child():
     json_data = {
@@ -28,6 +39,7 @@ def test_paragraph_with_child():
     expected_markdown = "This is a paragraph with **bold text**\n\n"
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_nested_paragraph():
     json_data = {
         "#name": "para",
@@ -41,11 +53,10 @@ def test_nested_paragraph():
             }
         ],
     }
-    expected_markdown = (
-        "This is a paragraph.\n\nThis is a nested paragraph.\n\n"
-    )
+    expected_markdown = "This is a paragraph.\n\nThis is a nested paragraph.\n\n"
     print(json_to_markdown(json_data))
     assert json_to_markdown(json_data) == expected_markdown
+
 
 def test_list_unordered():
     json_data = {
@@ -81,6 +92,7 @@ def test_list_unordered():
     expected_markdown = "- •Item 1\n- •Item 2\n"
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_list_ordered():
     json_data = {
         "#name": "list",
@@ -115,6 +127,7 @@ def test_list_ordered():
     expected_markdown = "1 Item 1\n2 Item 2\n"
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_list_mixed():
     json_data = {
         "#name": "list",
@@ -148,6 +161,7 @@ def test_list_mixed():
     }
     expected_markdown = "1 Item 1\n- •Item 2\n"
     assert json_to_markdown(json_data) == expected_markdown
+
 
 def test_nested_list():
     json_data = {
@@ -192,6 +206,7 @@ def test_nested_list():
     expected_markdown = "1 Item 1\n  - •Nested Item 1\n"
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_simple_math():
     json_data = {
         "#name": "math",
@@ -216,6 +231,7 @@ def test_simple_math():
 
     expected_markdown = "$x + 1$"
     assert handle_math(json_data) == expected_markdown
+
 
 def test_complex_math():
     json_data = {
@@ -247,12 +263,12 @@ def test_complex_math():
     expected_markdown = "$\\dot{W}_{s} \\le 0$"
     assert handle_math(json_data) == expected_markdown
 
+
 def test_image_url_construction():
     locator = "3-s2.0-B9780444637833000186-f18-01-9780444637833.gif"
-    expected_url = (
-        "https://ars.els-cdn.com/content/image/" + locator
-    )
+    expected_url = "https://ars.els-cdn.com/content/image/" + locator
     assert construct_image_url(locator) == expected_url
+
 
 def test_simple_figure():
     json_data = {
@@ -286,6 +302,7 @@ def test_simple_figure():
     )
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_handle_href_in_links():
     # Test case for http/https links
     json_data_http = {
@@ -304,6 +321,7 @@ def test_handle_href_in_links():
     }
     expected_markdown_pii = "[Chapter 12](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00012/5)"
     assert handle_intra_ref(json_data_pii) == expected_markdown_pii
+
 
 def test_handle_table():
     json_data = {
@@ -366,6 +384,7 @@ def test_handle_table():
     )
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_outline():
     json_data = {
         "#name": "outline",
@@ -373,43 +392,29 @@ def test_outline():
             {
                 "#name": "list",
                 "$$": [
+                    {"#name": "section-title", "_": "Outline"},
                     {
-                        "#name": "section-title",
-                        "_": "Outline"
+                        "#name": "list-item",
+                        "$$": [
+                            {"#name": "label", "_": "1."},
+                            {"#name": "para", "_": "First outline"},
+                        ],
                     },
                     {
                         "#name": "list-item",
                         "$$": [
-                            {
-                                "#name": "label",
-                                "_": "1."
-                            },
-                            {
-                                "#name": "para",
-                                "_": "First outline"
-                            }
-                        ]
+                            {"#name": "label", "_": "2."},
+                            {"#name": "para", "_": "Second outline"},
+                        ],
                     },
-                    {
-                        "#name": "list-item",
-                        "$$": [
-                            {
-                                "#name": "label",
-                                "_": "2."
-                            },
-                            {
-                                "#name": "para",
-                                "_": "Second outline"
-                            }
-                        ]
-                    }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
     expected_markdown = "## Outline\n\n1 First outline\n2 Second outline\n"
     assert handle_outline(json_data) == expected_markdown
+
 
 def test_basic_sections():
     json_data = {
@@ -417,16 +422,14 @@ def test_basic_sections():
         "$$": [
             {
                 "#name": "para",
-                "$": {
-                    "id": "p0190",
-                    "view": "all"
-                },
-                "_": "What is reactivity hazard? "
+                "$": {"id": "p0190", "view": "all"},
+                "_": "What is reactivity hazard? ",
             },
-        ]
+        ],
     }
     expected_markdown = "What is reactivity hazard? \n\n"
     assert json_to_markdown(json_data) == expected_markdown
+
 
 def test_complex_sections():
     json_data = {
@@ -442,105 +445,92 @@ def test_complex_sections():
             "xmlns:xsi": True,
             "xmlns:cals": True,
             "xmlns:sb": True,
-            "xmlns": True
+            "xmlns": True,
         },
         "$$": [
             {
                 "#name": "para",
-                "$": {
-                    "id": "p0190",
-                    "view": "all"
-                },
-                "_": "What is reactivity hazard? "
+                "$": {"id": "p0190", "view": "all"},
+                "_": "What is reactivity hazard? ",
             },
             {
                 "#name": "para",
-                "$": {
-                    "id": "p0195",
-                    "view": "all"
-                },
+                "$": {"id": "p0195", "view": "all"},
                 "$$": [
                     {
                         "#name": "__text__",
-                        "_": "A significant aspect of bioprocess engineering is considering how accidents could occur in biological and chemical processes in order to anticipate all possible modes by which the system might malfunction. This optimum design goal is discussed throughout this text, for example, see "
+                        "_": "A significant aspect of bioprocess engineering is considering how accidents could occur in biological and chemical processes in order to anticipate all possible modes by which the system might malfunction. This optimum design goal is discussed throughout this text, for example, see ",
                     },
                     {
                         "#name": "intra-ref",
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00003-4",
                             "id": "ia0010",
-                            "type": "simple"
+                            "type": "simple",
                         },
-                        "_": "Chapters 3"
+                        "_": "Chapters 3",
                     },
-                    {
-                        "#name": "__text__",
-                        "_": ", "
-                    },
+                    {"#name": "__text__", "_": ", "},
                     {
                         "#name": "intra-ref",
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00004-6",
                             "id": "ia0015",
-                            "type": "simple"
+                            "type": "simple",
                         },
-                        "_": "4"
+                        "_": "4",
                     },
-                    {
-                        "#name": "__text__",
-                        "_": ", "
-                    },
+                    {"#name": "__text__", "_": ", "},
                     {
                         "#name": "intra-ref",
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00005-8",
                             "id": "ia0020",
-                            "type": "simple"
+                            "type": "simple",
                         },
-                        "_": "5"
+                        "_": "5",
                     },
-                    {
-                        "#name": "__text__",
-                        "_": ", and "
-                    },
+                    {"#name": "__text__", "_": ", and "},
                     {
                         "#name": "intra-ref",
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00017-4",
                             "id": "ia0045",
-                            "type": "simple"
+                            "type": "simple",
                         },
-                        "_": "17"
+                        "_": "17",
                     },
                     {
                         "#name": "__text__",
-                        "_": ". However, we also need to consider whether that design is sufficiently robust that it will be stable in any unforeseen situations that may arise. Stability and sustainability of the reactor system of bioprocess are discussed in "
+                        "_": ". However, we also need to consider whether that design is sufficiently robust that it will be stable in any unforeseen situations that may arise. Stability and sustainability of the reactor system of bioprocess are discussed in ",
                     },
                     {
                         "#name": "intra-ref",
                         "$": {
                             "href": "pii:B978-0-444-63783-3.00015-0",
                             "id": "ia0050",
-                            "type": "simple"
+                            "type": "simple",
                         },
-                        "_": "Chapter 15"
+                        "_": "Chapter 15",
                     },
                     {
                         "#name": "__text__",
-                        "_": ". We need also to examine operating modes outside of the regime of optimal design and assure that for all possible situations in which the system may be operated, uncontrollable consequences will not occur. Chain reactions and/or uncontrolled combustion/explosion are often associated with accidents. We will discuss this subject and its application in industry, as well."
-                    }
-                ]
-            }
-        ]
+                        "_": ". We need also to examine operating modes outside of the regime of optimal design and assure that for all possible situations in which the system may be operated, uncontrollable consequences will not occur. Chain reactions and/or uncontrolled combustion/explosion are often associated with accidents. We will discuss this subject and its application in industry, as well.",
+                    },
+                ],
+            },
+        ],
     }
     expected_markdown = "What is reactivity hazard? \n\nA significant aspect of bioprocess engineering is considering how accidents could occur in biological and chemical processes in order to anticipate all possible modes by which the system might malfunction. This optimum design goal is discussed throughout this text, for example, see [Chapters 3](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00003/4), [4](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00004/6), [5](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00005/8), and [17](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00017/4). However, we also need to consider whether that design is sufficiently robust that it will be stable in any unforeseen situations that may arise. Stability and sustainability of the reactor system of bioprocess are discussed in [Chapter 15](https://www.sciencedirect.com/science/article/B978/0/444/63783/3/00015/0). We need also to examine operating modes outside of the regime of optimal design and assure that for all possible situations in which the system may be operated, uncontrollable consequences will not occur. Chain reactions and/or uncontrolled combustion/explosion are often associated with accidents. We will discuss this subject and its application in industry, as well.\n\n"
     assert json_to_markdown(json_data) == expected_markdown
+
 
 def test_handle_footnotes():
     json_data = {"footnotes": []}
     # Currently, footnotes are expected to be empty
     expected_markdown = ""
     assert json_to_markdown(json_data) == expected_markdown
+
 
 def test_handle_attachments():
     json_data = {
@@ -554,7 +544,7 @@ def test_handle_attachments():
                 "filesize": "21318",
                 "pixel-height": "357",
                 "pixel-width": "344",
-                "attachment-type": "IMAGE-DOWNSAMPLED"
+                "attachment-type": "IMAGE-DOWNSAMPLED",
             },
             {
                 "attachment-eid": "3-s2.0-B9780444637833000186-f18-01-9780444637833.sml",
@@ -565,8 +555,8 @@ def test_handle_attachments():
                 "filesize": "6860",
                 "pixel-height": "164",
                 "pixel-width": "158",
-                "attachment-type": "IMAGE-THUMBNAIL"
-            }
+                "attachment-type": "IMAGE-THUMBNAIL",
+            },
         ]
     }
     # For now, we expect attachments to be handled based on their usage in the content
@@ -574,17 +564,20 @@ def test_handle_attachments():
     expected_markdown = ""
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_handle_correspondences():
     json_data = {"correspondences": {}}
     # Currently, correspondences are expected to be empty
     expected_markdown = ""
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_handle_affiliations():
     json_data = {"affiliations": {}}
     # Currently, affiliations are expected to be empty
     expected_markdown = ""
     assert json_to_markdown(json_data) == expected_markdown
+
 
 def test_missing_name():
     json_data = {
@@ -594,6 +587,7 @@ def test_missing_name():
     expected_markdown = "Missing name.\n\n"
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_missing_attributes():
     json_data = {
         "#name": "para",
@@ -602,6 +596,7 @@ def test_missing_attributes():
     expected_markdown = "Missing attributes.\n\n"
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_missing_text():
     json_data = {
         "#name": "para",
@@ -609,6 +604,7 @@ def test_missing_text():
     }
     expected_markdown = "\n\n"
     assert json_to_markdown(json_data) == expected_markdown
+
 
 def test_empty_list():
     json_data = {
@@ -619,6 +615,7 @@ def test_empty_list():
     expected_markdown = ""
     assert json_to_markdown(json_data) == expected_markdown
 
+
 def test_empty_table():
     json_data = {
         "#name": "table",
@@ -627,6 +624,7 @@ def test_empty_table():
     }
     expected_markdown = "\n\n"
     assert json_to_markdown(json_data) == expected_markdown
+
 
 def test_invalid_math():
     json_data = {
@@ -640,6 +638,7 @@ def test_invalid_math():
     }
     expected_markdown = ""
     assert handle_math(json_data) == expected_markdown
+
 
 def test_malformed_json():
     with pytest.raises(TypeError):
