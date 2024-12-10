@@ -177,10 +177,11 @@ def convert_json_to_mathml(data):
             tag_name = data["#name"]
             if tag_name == "math":
                 mathml_string = "<math"
+                mathml_string += """ xmlns="http://www.w3.org/1998/Math/MathML" """
                 if "$" in data:
                     for attr, value in data["$"].items():
-                        mathml_string += f' {attr}="{value}"'
-                    mathml_string += """ xmlns="http://www.w3.org/1998/Math/MathML" """
+                        mathml_string += f'{attr}="{value}" '
+                mathml_string = mathml_string.strip()
                 mathml_string += ">"
                 if "$$" in data:
                     mathml_string += convert_json_to_mathml(data["$$"])
