@@ -84,7 +84,7 @@ def json_to_markdown(data):
             elif tag_name == "textbox-body":
                 markdown_output += handle_textbox_body(data)
             elif tag_name == "inline-figure":
-                markdown_output += handle_inline_figure(data, attachment_lookup)
+                markdown_output += handle_inline_figure(data)
             elif tag_name == "link":
                 markdown_output += handle_link(data)
             elif tag_name == "__text__":
@@ -455,7 +455,7 @@ def handle_textbox_body(data):
     return markdown_output
 
 
-def handle_inline_figure(data, attachment_lookup):
+def handle_inline_figure(data):
     for item in data["$$"]:
         if item["#name"] == "link":
             if "$" in item and "locator" in item["$"]:
