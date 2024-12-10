@@ -1,4 +1,5 @@
 import os
+import re
 import json
 from lxml import etree
 
@@ -520,6 +521,16 @@ def construct_image_url(locator):
     return f"https://ars.els-cdn.com/content/image/{locator}"
 
 
+def remove_trailing_commas(json_string):
+    """Removes trailing commas from a JSON string."""
+
+    # Remove trailing commas in objects and arrays
+    cleaned_json_string = re.sub(r',\s*}', '}', json_string)
+    cleaned_json_string = re.sub(r',\s*]', ']', cleaned_json_string)
+
+    return cleaned_json_string
+
+
 # Entry point for Streamlit app
 def main():
     st.title("JSON to Markdown Converter for Elsevier")
@@ -529,7 +540,8 @@ def main():
 
     if st.button("Convert to Markdown"):
         try:
-            data = json.loads(json_data)
+            cleaned_json_data = remove_trailing_commas(json_data)
+            data = json.loads(cleaned_json_data)
             markdown_output = json_to_markdown(data)
             col1, col2 = st.columns(2)
             with col1:
