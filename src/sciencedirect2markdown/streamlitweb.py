@@ -149,7 +149,7 @@ def mathml2latex_transpect(equation):
     xslt = etree.parse(xslt_file)
     transform = etree.XSLT(xslt)
     newdom = transform(dom)
-    return newdom.getroot().text
+    return newdom
 
 def handle_math(data):
     if not ("$$" in data and isinstance(data["$$"], list)):
@@ -159,13 +159,10 @@ def handle_math(data):
     
     print(mathml_content)
 
-    try:
-        latex_string = mathml2latex_yarosh(mathml_content)
+    latex_string = mathml2latex_yarosh(mathml_content)
 
-        return f"${latex_string}$"
-    except Exception as e:
-        print(f"Error converting MathML to LaTeX: {e}")
-        return ""
+    return f"${latex_string}$"
+
 
 def convert_json_to_mathml(data):
     """Converts the math part of JSON data to MathML."""
