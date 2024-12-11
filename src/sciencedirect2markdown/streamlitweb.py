@@ -512,7 +512,27 @@ def handle_outline(data):
 
 
 def handle_section(data):
+    if "$$" in data:
+        for item in data["$$"]:
+            if item.get("#name") == "section-title":
+                return handle_section_with_title(data)
     return f"\n\n---\n\n{handle_label(data)}\n\n---\n\n"
+
+
+def handle_section_with_title(data):
+    label = ""
+    section_title = ""
+    other_content = ""
+    if "$$" in data:
+        for item in data["$$"]:
+            if item.get("#name") == "label":
+                label = handle_label(item)
+            elif item.get("#name") == "section-title":
+                section_title = handle_label(item)
+            else:
+                other_content += json_to_markdown(item)
+
+    return f"\n\n---\n\n## {label} {section_title}\n\n{other_content}\n\n---\n\n"
 
 
 def handle_section_title(data):
