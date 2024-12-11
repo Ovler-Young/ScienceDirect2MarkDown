@@ -182,16 +182,18 @@ def handle_list(data, level=0):
                             nested_content = handle_list(subitem, current_level + 1)
 
                     # Format the list item with proper indentation
-                    if label and label[-1] == "." and label[:-1].isdigit():
-                        # Ordered list item
-                        markdown_output += (
-                            "    " * current_level + f"{label} {content}\n"
-                        )
+                    if label:
+                        if label[-1] == "." and label[:-1].isdigit():
+                            # Ordered list item
+                            markdown_output += (
+                                "    " * current_level + f"{label} {content}\n"
+                            )
+                        else:
+                            # Unordered list item
+                            markdown_output += "    " * current_level + f"- {content}\n"
                     else:
-                        # Unordered list item
-                        markdown_output += (
-                            "    " * current_level + f"- {label} {content}\n"
-                        )
+                        # List item without a label
+                        markdown_output += "    " * current_level + f"- {content}\n"
 
                     # Add any nested content
                     if nested_content:
@@ -428,7 +430,11 @@ def handle_label(data):
 def handle_cross_ref(data):
     if "refid" in data["$"]:
         refid = data["$"]["refid"]
-        return f"[{handle_label(data)}](#{refid})"
+        link_text = ""
+        if "$$" in data:
+            for sub_item in data["$$"]:
+                link_text += json_to_markdown(sub_item)
+        return f"[{link_text}](#{refid})"
     return handle_label(data) if "_" in data else ""
 
 
