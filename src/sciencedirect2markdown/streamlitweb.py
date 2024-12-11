@@ -95,7 +95,7 @@ def json_to_markdown(data):
             elif tag_name == "link":
                 markdown_output += handle_link(data)
             elif tag_name == "__text__":
-                markdown_output += handle_text(data)
+                markdown_output += handle_label(data)
             else:
                 if "_" in data:
                     markdown_output += handle_label(data)
@@ -599,10 +599,6 @@ def handle_link(data):
         image_url = construct_image_url(data["$"]["locator"])
         return f"![]({image_url})"
     return ""
-
-
-def handle_text(data):
-    return handle_label(data)
 
 
 def construct_image_url(locator):
