@@ -563,6 +563,7 @@ def handle_inf(data):
             print(data)
     return "$_{" + text + "}$"
 
+
 def handle_hsp(data):
     return " "
 
@@ -740,9 +741,14 @@ def remove_trailing_commas(json_string):
 # Entry point for Streamlit app
 def main():
     st.set_page_config(layout="wide")
-    colx, coly = st.columns([2, 1])
+    colx, coly = st.columns([2, 1], vertical_alignment="bottom")
     with colx:
         st.title("Sciencedirect JSON to Markdown")
+        st.markdown(
+            """
+            This tool eats data from Sciencedirect. You may manually copy the json from the devtools:\n1. Open the paper/charpter you want to read, then press F12; \n2. Go to the network tab, search `body`; \n3. Press `Ctrl+R`, refresh the page;\n4. click the first item in the search result, go to the response tab, select all and copy;\n 5. Paste the json below, or save the json as file, then upload it to the upload box on the right.
+            """
+        )
     with coly:
         # upload JSON file
         uploaded_file = st.file_uploader(
@@ -753,7 +759,10 @@ def main():
         )
 
     # Input JSON data
-    json_data = st.text_area("Or paste JSON data here", height=200)
+    json_data = st.text_area(
+        "Upload JSON data at the top, or paste it here.",
+        placeholder="Paste JSON data here...",
+    )
 
     cola, colb = st.columns(2)
 
