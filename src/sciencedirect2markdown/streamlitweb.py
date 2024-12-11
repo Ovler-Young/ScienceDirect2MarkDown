@@ -527,7 +527,7 @@ def handle_section_title(data):
 
 
 def handle_br(data):
-    return "\n"
+    return "<br>"
 
 
 def handle_bold(data):
