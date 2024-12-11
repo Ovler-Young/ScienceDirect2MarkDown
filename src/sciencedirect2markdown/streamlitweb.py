@@ -403,14 +403,10 @@ def handle_thead(data):
                 row_data = []
                 if "$$" in item:
                     for entry in item["$$"]:
-                        if entry["#name"] == "entry":
-                            if "_" in entry:
-                                row_data.append(handle_label(entry))
-                            else:
-                                row_data.append("")
+                        row_data.append(handle_label(entry))
+
                 header.append(row_data)
-    # Flatten the header list
-    return header[0] if header else []
+    return header
 
 
 def handle_tbody(data):
