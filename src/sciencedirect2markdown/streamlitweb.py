@@ -409,6 +409,13 @@ def handle_tgroup(data):
                 for i in range(len(header_row)):
                     markdown_output += "---|"
                 markdown_output += "\n"
+        elif num_cols > 0:
+            # Add separator row even if there's no header
+            markdown_output += "|"
+            markdown_output += " |" * num_cols
+            markdown_output += "\n|"
+            markdown_output += "---|" * num_cols
+            markdown_output += "\n"
 
         if rows:
             for row in rows:
