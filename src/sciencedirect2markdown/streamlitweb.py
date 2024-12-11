@@ -741,7 +741,7 @@ def remove_trailing_commas(json_string):
 # Entry point for Streamlit app
 def main():
     st.set_page_config(layout="wide")
-    colx, coly = st.columns([2, 1], vertical_alignment="bottom")
+    colx, coly = st.columns([3, 2], vertical_alignment="bottom")
     with colx:
         st.title("Sciencedirect JSON to Markdown")
         st.markdown(
@@ -757,7 +757,13 @@ def main():
             label_visibility="collapsed",
             help="Upload a JSON file to convert to Markdown.",
         )
-
+        
+        colm, coln = st.columns(2)
+        with colm:
+            convert = st.button("Convert")
+        with coln:
+            hide_original = st.checkbox("Hide Raw Markdown", value=True)
+    
     # Input JSON data
     json_data = st.text_area(
         "Upload JSON data at the top, or paste it here.",
@@ -765,13 +771,6 @@ def main():
     )
 
     cola, colb = st.columns(2)
-
-    with cola:
-        colx, coly = st.columns(2)
-        with colx:
-            convert = st.button("Convert to Markdown")
-        with coly:
-            hide_original = st.checkbox("Hide original JSON data")
 
     if not convert:
         st.stop()
@@ -791,14 +790,13 @@ def main():
     with cola:
         st.header("Markdown Output")
     with colb:
-        col1, col2 = st.columns(2, gap="small", vertical_alignment="bottom")
-        with col1:
+        with colm:
             title_input = st.text_input(
                 "Title",
                 "converted_markdown.md",
                 label_visibility="collapsed",
             )
-        with col2:
+        with coln:
             # Download button
             st.download_button(
                 label="Download Markdown",
