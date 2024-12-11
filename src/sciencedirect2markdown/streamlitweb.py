@@ -523,16 +523,19 @@ def handle_section_with_title(data):
     label = ""
     section_title = ""
     other_content = ""
+    heading_level = 2
     if "$$" in data:
         for item in data["$$"]:
             if item.get("#name") == "label":
                 label = handle_label(item)
+                if "." in label:
+                    heading_level = len(label.split("."))
             elif item.get("#name") == "section-title":
                 section_title = handle_label(item)
             else:
                 other_content += json_to_markdown(item)
 
-    return f"\n\n---\n\n## {label} {section_title}\n\n{other_content}\n\n---\n\n"
+    return f"\n\n---\n\n{'#' * heading_level} {label} {section_title}\n\n{other_content}\n\n---\n\n"
 
 
 def handle_section_title(data):
