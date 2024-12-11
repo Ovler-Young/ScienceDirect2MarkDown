@@ -202,8 +202,10 @@ def handle_list(data, level=0):
 
             elif item.get("#name") == "list":
                 markdown_output += handle_list(item, level + 1)
-    
+
     markdown_output += "\n"
+
+    markdown_output = markdown_output.replace("\n\n\n", "\n\n")
 
     return markdown_output
 
