@@ -735,7 +735,7 @@ def main():
     st.set_page_config(layout="wide")
     colx, coly = st.columns([2, 1])
     with colx:
-        st.title("JSON to Markdown Converter for Sciencedirect")
+        st.title("Sciencedirect JSON to Markdown")
     with coly:
         # upload JSON file
         uploaded_file = st.file_uploader(
@@ -751,39 +751,54 @@ def main():
     cola, colb = st.columns(2)
 
     with cola:
-        if st.button("Convert to Markdown"):
-            try:
-                if uploaded_file:
-                    json_data = uploaded_file.read().decode("utf-8")
-                cleaned_json_data = remove_trailing_commas(json_data)
-                data = json.loads(cleaned_json_data)
-                markdown_output = json_to_markdown(data)
-                st.header("Markdown Output Rendered")
-                st.markdown(markdown_output, unsafe_allow_html=True)
-                with colb:
-                    col1, col2 = st.columns(2, gap="small", vertical_alignment="bottom")
-                    with col1:
-                        title_input = st.text_input(
-                            "Title",
-                            "converted_markdown.md",
-                            label_visibility="collapsed",
-                        )
-                    with col2:
-                        # Download button
-                        st.download_button(
-                            label="Download Markdown",
-                            data=markdown_output.encode("utf-8"),
-                            file_name=title_input,
-                            mime="text/markdown",
-                        )
-                    st.header("Markdown Output Raw")
-                    st.markdown(f"```markdown\n{markdown_output}\n```")
+        colx, coly = st.columns(2)
+        with colx:
+            convert = st.button("Convert to Markdown")
+        with coly:
+            hide_original = st.checkbox("Hide original JSON data")
 
-            except json.JSONDecodeError:
-                st.error("Invalid JSON format. Please check your input.")
-            except Exception as e:
-                st.error(f"An error occurred: {e.__cause__}")
-                st.exception(e)
+    if not convert:
+        st.stop()
+
+    try:
+        if uploaded_file:
+            json_data = uploaded_file.read().decode("utf-8")
+        cleaned_json_data = remove_trailing_commas(json_data)
+        data = json.loads(cleaned_json_data)
+        markdown_output = json_to_markdown(data)
+    except json.JSONDecodeError:
+        st.error("Invalid JSON format. Please check your input.")
+    except Exception as e:
+        st.error(f"An error occurred: {e.__cause__}")
+        st.exception(e)
+
+    with cola:
+        st.header("Markdown Output")
+    with colb:
+        col1, col2 = st.columns(2, gap="small", vertical_alignment="bottom")
+        with col1:
+            title_input = st.text_input(
+                "Title",
+                "converted_markdown.md",
+                label_visibility="collapsed",
+            )
+        with col2:
+            # Download button
+            st.download_button(
+                label="Download Markdown",
+                data=markdown_output.encode("utf-8"),
+                file_name=title_input,
+                mime="text/markdown",
+            )
+
+    if hide_original:
+        st.markdown(markdown_output, unsafe_allow_html=True)
+    else:
+        with cola:
+            st.markdown(markdown_output, unsafe_allow_html=True)
+        with colb:
+            st.header("Markdown Output Raw")
+            st.markdown(f"```markdown\n{markdown_output}\n```")
 
 
 if __name__ == "__main__":
