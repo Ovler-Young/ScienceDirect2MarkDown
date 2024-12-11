@@ -457,7 +457,7 @@ def handle_tbody(data):
                                     content = handle_label(entry)
                                     row_data.append(content)
                                     col_index += 1
-                                        else:
+                            else:
                                 content = handle_label(entry)
                                 row_data.append(content)
                                 col_index += 1
