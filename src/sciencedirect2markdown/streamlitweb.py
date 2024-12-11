@@ -334,7 +334,7 @@ def handle_table(data):
             + markdown_output
         )
     if source:
-        markdown_output += f"\nSource: {source}\n"
+        markdown_output += f"\nSource: {source}\n\n---\n\n"
     return markdown_output
 
 
