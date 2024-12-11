@@ -159,7 +159,7 @@ def handle_simple_para(data):
 
 
 def handle_list(data, level=0):
-    markdown_output = ""
+    markdown_output = "\n"
     current_level = level
     if "$$" in data:
         for item in data["$$"]:
