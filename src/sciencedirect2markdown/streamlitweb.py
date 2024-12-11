@@ -198,6 +198,8 @@ def handle_list(data, level=0):
                     for subitem in item["$$"]:
                         if subitem.get("#name") == "label":
                             label = handle_label(subitem)
+                            if label == "•":
+                                label = None
                         elif subitem.get("#name") == "para":
                             content = handle_para(subitem).strip()
                         elif subitem.get("#name") == "list":
