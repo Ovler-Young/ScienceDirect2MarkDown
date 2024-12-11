@@ -257,8 +257,11 @@ def handle_math(data):
         return ""
 
     mathml_content = convert_json_to_mathml(data)
-
-    latex_string = mathml2latex_yarosh(mathml_content)
+    
+    try:
+        latex_string = mathml2latex_yarosh(mathml_content)
+    except:
+        latex_string = mathml_content
 
     return f"${latex_string}$"
 
