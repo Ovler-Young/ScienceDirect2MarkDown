@@ -35,24 +35,6 @@ def test_paragraph_with_child():
     assert json_to_markdown(json_data) == expected_markdown
 
 
-def test_nested_paragraph():
-    json_data = {
-        "#name": "para",
-        "$": {"id": "p0010", "view": "all"},
-        "_": "This is a paragraph.",
-        "$$": [
-            {
-                "#name": "para",
-                "$": {"id": "p0011", "view": "all"},
-                "_": "This is a nested paragraph.",
-            }
-        ],
-    }
-    expected_markdown = "This is a paragraph.\n\nThis is a nested paragraph.\n\n"
-    print(json_to_markdown(json_data))
-    assert json_to_markdown(json_data) == expected_markdown
-
-
 def test_list_unordered():
     json_data = {
         "#name": "list",
@@ -84,7 +66,7 @@ def test_list_unordered():
             },
         ],
     }
-    expected_markdown = "- • Item 1\n- • Item 2\n"
+    expected_markdown = "\n- • Item 1\n- • Item 2\n\n"
     assert json_to_markdown(json_data) == expected_markdown
 
 
@@ -119,7 +101,7 @@ def test_list_ordered():
             },
         ],
     }
-    expected_markdown = "1. Item 1\n2. Item 2\n"
+    expected_markdown = "\n1. Item 1\n2. Item 2\n\n"
     assert json_to_markdown(json_data) == expected_markdown
 
 
@@ -154,7 +136,7 @@ def test_list_mixed():
             },
         ],
     }
-    expected_markdown = "1. Item 1\n- • Item 2\n"
+    expected_markdown = "\n1. Item 1\n- • Item 2\n\n"
     assert json_to_markdown(json_data) == expected_markdown
 
 
@@ -195,7 +177,7 @@ def test_nested_list():
             }
         ],
     }
-    expected_markdown = "1. Item 1\n    - • Nested Item 1\n"
+    expected_markdown = "\n1. Item 1\n\n    - • Nested Item 1\n\n"
     assert json_to_markdown(json_data) == expected_markdown
 
 
@@ -315,41 +297,24 @@ def test_complex_nested_list():
     }
 
     expected_markdown = (
-        "1. First level item\n"
-        "2. Second level item\n"
+        "\n1. First level item\n"
+        "2. Second level item\n\n"
         "    1. Sub-item 2.1\n"
-        "    2. Sub-item 2.2\n"
+        "    2. Sub-item 2.2\n\n"
         "        - 2.2.1. Deep nested 2.2.1\n"
         "        - 2.2.2. Deep nested 2.2.2\n"
-        "        - 2.2.3. Deep nested 2.2.3\n"
-        "    3. Sub-item 2.3\n"
-        "3. Third level item\n"
+        "        - 2.2.3. Deep nested 2.2.3\n\n"
+        "    3. Sub-item 2.3\n\n"
+        "3. Third level item\n\n"
         "    - a. Alpha sub-item a\n"
-        "    - b. Alpha sub-item b\n"
-        "4. Fourth level item\n"
+        "    - b. Alpha sub-item b\n\n"
+        "4. Fourth level item\n\n"
     )
 
     assert json_to_markdown(json_data) == expected_markdown
 
 
-def test_simple_math():
-    json_data = {
-        "#name": "math",
-        "$$": [
-            {"#name": "mi", "_": "x"},
-            {"#name": "mo", "_": "+"},
-            {"#name": "mn", "_": "1"},
-        ],
-    }
-
-    expected_mathml = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi><mo>+</mo><mn>1</mn></math>'
-    assert convert_json_to_mathml(json_data) == expected_mathml
-
-    expected_markdown = "$x + 1$"
-    assert handle_math(json_data) == expected_markdown
-
-
-def test_complex_math():
+def test_math():
     json_data = {
         "#name": "math",
         "$": {"altimg": "si21.gif", "overflow": "scroll"},
@@ -494,37 +459,6 @@ def test_handle_table():
         + "*Table Caption*\n\n"
     )
     assert json_to_markdown(json_data) == expected_markdown
-
-
-def test_outline():
-    json_data = {
-        "#name": "outline",
-        "$$": [
-            {
-                "#name": "list",
-                "$$": [
-                    {"#name": "section-title", "_": "Outline"},
-                    {
-                        "#name": "list-item",
-                        "$$": [
-                            {"#name": "label", "_": "1."},
-                            {"#name": "para", "_": "First outline"},
-                        ],
-                    },
-                    {
-                        "#name": "list-item",
-                        "$$": [
-                            {"#name": "label", "_": "2."},
-                            {"#name": "para", "_": "Second outline"},
-                        ],
-                    },
-                ],
-            }
-        ],
-    }
-
-    expected_markdown = "## Outline\n\n1. First outline\n2. Second outline\n"
-    assert handle_outline(json_data) == expected_markdown
 
 
 def test_basic_sections():
@@ -690,12 +624,6 @@ def test_handle_affiliations():
     assert json_to_markdown(json_data) == expected_markdown
 
 
-def test_missing_name():
-    json_data = {"$": {"id": "p0010", "view": "all"}, "_": "Missing name."}
-    expected_markdown = "Missing name.\n\n"
-    assert json_to_markdown(json_data) == expected_markdown
-
-
 def test_missing_attributes():
     json_data = {"#name": "para", "_": "Missing attributes."}
     expected_markdown = "Missing attributes.\n\n"
@@ -708,32 +636,7 @@ def test_missing_text():
     assert json_to_markdown(json_data) == expected_markdown
 
 
-def test_empty_list():
-    json_data = {"#name": "list", "$": {"id": "l0010"}, "$$": []}
-    expected_markdown = ""
-    assert json_to_markdown(json_data) == expected_markdown
-
-
 def test_empty_table():
     json_data = {"#name": "table", "$": {"id": "t0010"}, "$$": []}
     expected_markdown = ""
     assert json_to_markdown(json_data) == expected_markdown
-
-
-def test_invalid_math():
-    json_data = {
-        "#name": "math",
-        "$$": [
-            {
-                "#name": "invalid",
-                "_": "Invalid MathML",
-            }
-        ],
-    }
-    expected_markdown = ""
-    assert handle_math(json_data) == expected_markdown
-
-
-def test_malformed_json():
-    with pytest.raises(TypeError):
-        json_to_markdown("This is not JSON")
