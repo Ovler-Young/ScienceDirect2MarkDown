@@ -524,8 +524,8 @@ def remove_trailing_commas(json_string):
     """Removes trailing commas from a JSON string."""
 
     # Remove trailing commas in objects and arrays
-    cleaned_json_string = re.sub(r',\s*}', '}', json_string)
-    cleaned_json_string = re.sub(r',\s*]', ']', cleaned_json_string)
+    cleaned_json_string = re.sub(r",\s*}", "}", json_string)
+    cleaned_json_string = re.sub(r",\s*]", "]", cleaned_json_string)
 
     return cleaned_json_string
 
@@ -533,16 +533,28 @@ def remove_trailing_commas(json_string):
 # Entry point for Streamlit app
 def main():
     st.set_page_config(layout="wide")
-    st.title("JSON to Markdown Converter for Elsevier")
+    colx, coly = st.columns([2, 1])
+    with colx:
+        st.title("JSON to Markdown Converter for Elsevier")
+    with coly:
+        # upload JSON file
+        uploaded_file = st.file_uploader(
+            "Upload JSON file",
+            type=["json"],
+            label_visibility="collapsed",
+            help="Upload a JSON file to convert to Markdown.",
+        )
 
     # Input JSON data
-    json_data = st.text_area("Paste JSON data here", height=300)
+    json_data = st.text_area("Or paste JSON data here", height=200)
 
     cola, colb = st.columns(2)
-    
+
     with cola:
         if st.button("Convert to Markdown"):
             try:
+                if uploaded_file:
+                    json_data = uploaded_file.read().decode("utf-8")
                 cleaned_json_data = remove_trailing_commas(json_data)
                 data = json.loads(cleaned_json_data)
                 markdown_output = json_to_markdown(data)
@@ -551,7 +563,11 @@ def main():
                 with colb:
                     col1, col2 = st.columns(2, gap="small", vertical_alignment="bottom")
                     with col1:
-                        title_input = st.text_input("Title", "converted_markdown.md", label_visibility="collapsed")
+                        title_input = st.text_input(
+                            "Title",
+                            "converted_markdown.md",
+                            label_visibility="collapsed",
+                        )
                     with col2:
                         # Download button
                         st.download_button(
