@@ -606,10 +606,7 @@ def handle_label(data):
 def handle_cross_ref(data):
     if "refid" in data["$"]:
         refid = data["$"]["refid"]
-        link_text = ""
-        if "$$" in data:
-            for sub_item in data["$$"]:
-                link_text += json_to_markdown(sub_item)
+        link_text = handle_label(data)
         return f"[{link_text}](#{refid})"
     return handle_label(data) if "_" in data else ""
 
