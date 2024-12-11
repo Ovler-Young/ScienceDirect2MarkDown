@@ -72,12 +72,22 @@ def json_to_markdown(data):
                 markdown_output += handle_section_title(data)
             elif tag_name == "simple-para":
                 markdown_output += handle_simple_para(data)
+            elif tag_name == "br":
+                markdown_output += handle_br(data)
             elif tag_name == "bold":
                 markdown_output += handle_bold(data)
             elif tag_name == "italic":
                 markdown_output += handle_italic(data)
             elif tag_name == "small-caps":
                 markdown_output += handle_small_caps(data)
+            elif tag_name == "sup":
+                markdown_output += handle_sup(data)
+            elif tag_name == "inf":
+                markdown_output += handle_inf(data)
+            elif tag_name == "hsp":
+                markdown_output += handle_hsp(data)
+            elif tag_name == "formula":
+                markdown_output += handle_formula(data)
             elif tag_name == "label":
                 markdown_output += handle_label(data)
             elif tag_name == "cross-ref":
@@ -510,6 +520,8 @@ def handle_section(data):
 def handle_section_title(data):
     return "## " + handle_label(data) + "\n\n"
 
+def handle_br(data):
+    return "\n"
 
 def handle_bold(data):
     return f"**{handle_label(data)}**"
@@ -524,6 +536,26 @@ def handle_small_caps(data):
     upper = handle_label(data).upper()
     # then make it small using latex format
     return f"$_{upper}$"
+
+def handle_sup(data):
+    return f"$^{handle_label(data)}$"
+
+def handle_inf(data):
+    return f"$_{handle_label(data)}$"
+
+def handle_hsp(data):
+    return " "
+
+# formula
+def handle_formula(data):
+    markdown_output = ""
+    if "$$" in data:
+        markdown_output += json_to_markdown(data["$$"])
+    if "$" in data:
+        if "id" in data["$"]:
+            id = data["$"]["id"]
+            markdown_output += f" [^({id})]"
+    return markdown_output
 
 
 def handle_label(data):
