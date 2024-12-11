@@ -304,9 +304,10 @@ def handle_figure(data):
 
     if image_url:
         markdown_output += f"![{label + "." if label else ''}{' ' + caption if caption else ''}]({image_url})\n\n"
-        markdown_output += (
-            f"*{label + "." if label else ''}{' ' + caption if caption else ''}*\n\n"
-        )
+        if caption or label:
+            markdown_output += (
+                f"*{label + "." if label else ''}{' ' + caption if caption else ''}*\n\n"
+            )
 
     return markdown_output
 
