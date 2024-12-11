@@ -451,12 +451,11 @@ def test_handle_table():
         ],
     }
     expected_markdown = (
-        "**Table 1**\n\n"
+        "**Table 1**: Table Caption\n\n"
         + "|Header 1|Header 2|\n"
         + "|---|---|\n"
         + "|Row 1, Cell 1|Row 1, Cell 2|\n"
         + "|Row 2, Cell 1|Row 2, Cell 2|\n\n"
-        + "*Table Caption*\n\n"
     )
     assert json_to_markdown(json_data) == expected_markdown
 

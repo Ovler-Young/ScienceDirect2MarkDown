@@ -320,15 +320,13 @@ def handle_table(data):
         for item in data["$$"]:
             if item["#name"] == "label":
                 label = handle_label(item)
-                if label:
-                    markdown_output += f"**{label}**\n\n"
             if item["#name"] == "caption":
                 caption = handle_caption(item).strip()
             elif item["#name"] == "tgroup":
                 markdown_output += handle_tgroup(item)
 
-    if caption:
-        markdown_output += f"*{caption}*\n\n"
+    if caption or label:
+        markdown_output = f"{'**' + label + '**:' if label else ''}{' ' + caption if caption else ''}\n\n" + markdown_output
     return markdown_output
 
 
