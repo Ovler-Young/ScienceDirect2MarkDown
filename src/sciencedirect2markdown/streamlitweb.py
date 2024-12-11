@@ -108,6 +108,8 @@ def json_to_markdown(data):
                 markdown_output += handle_caption(data)
             elif tag_name == "textbox-body":
                 markdown_output += handle_textbox_body(data)
+            elif tag_name == "chem":
+                markdown_output += handle_label(data)
             elif tag_name == "inline-figure":
                 markdown_output += handle_inline_figure(data)
             elif tag_name == "link":
