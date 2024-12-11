@@ -66,8 +66,8 @@ def json_to_markdown(data):
                 markdown_output += handle_table(data)
             elif tag_name == "outline":
                 markdown_output += handle_outline(data)
-            elif tag_name == "sections":
-                markdown_output += handle_sections(data)
+            elif tag_name == "sections" or tag_name == "body":
+                markdown_output += handle_label(data)
             elif tag_name == "section":
                 markdown_output += handle_section(data)
             elif tag_name == "section-title":
@@ -116,11 +116,10 @@ def json_to_markdown(data):
                 markdown_output += handle_link(data)
             elif tag_name == "__text__":
                 markdown_output += handle_label(data)
+            elif tag_name == "acknowledgment" or tag_name == "conflict-of-interest":
+                markdown_output += handle_label(data)
             else:
-                if "_" in data:
-                    markdown_output += handle_label(data)
-                if "$$" in data:
-                    markdown_output += json_to_markdown(data["$$"])
+                markdown_output += handle_label(data)
                 print(f"Unhandled tag: {tag_name} - {data}")
 
         elif "content" in data:
