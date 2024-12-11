@@ -542,16 +542,26 @@ def handle_small_caps(data):
     # Small caps are not supported in Markdown, so we convert them to uppercase
     upper = handle_label(data).upper()
     # then make it small using latex format
-    return f"$_{upper}$"
+    return "$_{" + upper + "}$"
 
 
 def handle_sup(data):
-    return f"$^{handle_label(data)}$"
+    return "$^{" + handle_label(data) + "}$"
 
 
 def handle_inf(data):
-    return f"$_{handle_label(data)}$"
-
+    text = handle_label(data)
+    # we need to add many / when special characters can come
+    if "$" in data:
+        loc = data["$"]["loc"]
+        if loc == "pre":
+            return "$^{" + text + "}$"
+        elif loc == "post":
+            return "$_{" + text + "}$"
+        else:
+            print(f"Unhandled loc: {loc}")
+            print(data)
+    return "$_{" + text + "}$"
 
 def handle_hsp(data):
     return " "
