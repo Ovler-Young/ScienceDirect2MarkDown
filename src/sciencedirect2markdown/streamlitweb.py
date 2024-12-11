@@ -66,6 +66,8 @@ def json_to_markdown(data):
                 markdown_output += handle_outline(data)
             elif tag_name == "sections":
                 markdown_output += handle_sections(data)
+            elif tag_name == "section":
+                markdown_output += handle_section(data)
             elif tag_name == "section-title":
                 markdown_output += handle_section_title(data)
             elif tag_name == "simple-para":
@@ -307,9 +309,7 @@ def handle_figure(data):
     if image_url:
         markdown_output += f"![{label + "." if label else ''}{' ' + caption if caption else ''}]({image_url})\n\n"
         if caption or label:
-            markdown_output += (
-                f"*{label + "." if label else ''}{' ' + caption if caption else ''}*\n\n"
-            )
+            markdown_output += f"*{label + "." if label else ''}{' ' + caption if caption else ''}*\n\n"
 
     return markdown_output
 
@@ -503,6 +503,10 @@ def handle_outline(data):
     return markdown_output
 
 
+def handle_section(data):
+    return f"/n/n---/n/n{json_to_markdown(data)}/n/n---/n/n"
+
+
 def handle_section_title(data):
     return "## " + handle_label(data) + "\n\n"
 
@@ -513,6 +517,7 @@ def handle_bold(data):
 
 def handle_italic(data):
     return f"*{handle_label(data)}*"
+
 
 def handle_small_caps(data):
     # Small caps are not supported in Markdown, so we convert them to uppercase
