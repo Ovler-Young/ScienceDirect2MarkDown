@@ -610,7 +610,8 @@ def handle_label(data):
     if "_" in data:
         _data = data["_"]
     if "$$" in data:
-        subdata = json_to_markdown(data["$$"])
+        for item in data["$$"]:
+            subdata += json_to_markdown(item)
     return _data + subdata
 
 
