@@ -12,4 +12,3 @@ You can priview the markdown in the app, and download the markdown file.
 
 1. Reference is in separate request, which I have not yet implemented and not plan to do so.
 2. Same-page jump is not working.
-3. If section-title have label, label will block the markdown header.
