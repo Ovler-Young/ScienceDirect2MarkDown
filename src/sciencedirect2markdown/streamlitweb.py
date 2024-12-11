@@ -334,6 +334,7 @@ def handle_table(data):
     caption = ""
     label = ""
     source = ""
+    footnotes = []
 
     if "$$" in data:
         for item in data["$$"]:
@@ -345,6 +346,8 @@ def handle_table(data):
                 source = handle_label(item)
             elif item["#name"] == "tgroup":
                 markdown_output += handle_tgroup(item)
+            elif item["#name"] == "table-footnote":
+                footnotes.append(handle_table_footnote(item))
 
     if caption or label:
         markdown_output = (
@@ -352,8 +355,27 @@ def handle_table(data):
             + markdown_output
         )
     if source:
-        markdown_output += f"\nSource: {source}\n\n---\n\n"
+        markdown_output += f"\nSource: {source}\n"
+
+    if footnotes:
+        markdown_output += "\n" + "\n".join(footnotes) + "\n"
+
+    markdown_output += "\n---\n\n"
+
     return markdown_output
+
+
+def handle_table_footnote(data):
+    label = ""
+    note_para = ""
+    if "$$" in data:
+        for item in data["$$"]:
+            if item["#name"] == "label":
+                label = handle_label(item)
+            elif item["#name"] == "note-para":
+                note_para = handle_label(item)
+
+    return f"- {label}. {note_para}"
 
 
 def handle_tgroup(data):
@@ -369,9 +391,9 @@ def handle_tgroup(data):
                 # You might want to extract col width info here
                 col_widths.append(1)  # Default width
             elif item["#name"] == "thead":
-                header = handle_thead(item)
+                header = handle_thead(item, num_cols)
             elif item["#name"] == "tbody":
-                rows = handle_tbody(item)
+                rows = handle_tbody(item, num_cols)
 
         if header:
             for header_row in header:
@@ -397,71 +419,74 @@ def handle_tgroup(data):
     return markdown_output
 
 
-def handle_thead(data):
+def handle_thead(data, num_cols):
     header = []
     if "$$" in data:
         for item in data["$$"]:
             if item["#name"] == "row":
-                row_data = []
+                row_data = [""] * num_cols
+                col_index = 0
                 if "$$" in item:
                     for entry in item["$$"]:
-                        row_data.append(handle_label(entry))
+                        if entry["#name"] == "entry":
+                            if "$" in entry:
+                                if "namest" in entry["$"] and "nameend" in entry["$"]:
+                                    start_col = int(entry["$"]["namest"][3:]) - 1
+                                    end_col = int(entry["$"]["nameend"][3:]) - 1
+                                    content = handle_label(entry)
+
+                                    # Fill in the spanned cells
+                                    for i in range(start_col, end_col + 1):
+                                        row_data[i] = content
+                                    col_index = end_col + 1
+                                elif "colname" in entry["$"]:
+                                    col_num = int(entry["$"]["colname"][3:]) - 1
+                                    content = handle_label(entry)
+                                    row_data[col_num] = content
+                                    col_index = col_num + 1
+                                else:
+                                    row_data[col_index] = handle_label(entry)
+                                    col_index += 1
+                            else:
+                                row_data[col_index] = handle_label(entry)
+                                col_index += 1
 
                 header.append(row_data)
     return header
 
 
-def handle_tbody(data):
+def handle_tbody(data, num_cols):
     rows = []
     if "$$" in data:
         for item in data["$$"]:
             if item["#name"] == "row":
-                row_data = []
+                row_data = [""] * num_cols
                 col_index = 0
                 if "$$" in item:
                     for entry in item["$$"]:
                         if entry["#name"] == "entry":
                             content = ""
-
-                            if "$" in entry:  # Check if "$" exists
-                                if "align" in entry["$"]:
-                                    if entry["$"]["align"] == "left":
-                                        content = ""  # Reset content for left alignment
+                            if "$" in entry:
                                 if "namest" in entry["$"] and "nameend" in entry["$"]:
-                                    start_col = int(entry["$"]["namest"][-1]) - 1
-                                    end_col = int(entry["$"]["nameend"][-1]) - 1
-                                    spanned_cols = end_col - start_col + 1
-
-                                    # Add empty cells for any skipped columns
-                                    while col_index < start_col:
-                                        row_data.append("")
-                                        col_index += 1
-
+                                    start_col = int(entry["$"]["namest"][3:]) - 1
+                                    end_col = int(entry["$"]["nameend"][3:]) - 1
                                     content = handle_label(entry)
 
-                                    row_data.append(content)
-                                    col_index += 1
+                                    # Fill in the spanned cells
+                                    for i in range(start_col, end_col + 1):
+                                        row_data[i] = content
+                                    col_index = end_col + 1
 
-                                    # Fill in empty cells for spanned columns
-                                    for _ in range(spanned_cols - 1):
-                                        row_data.append("")
-                                        col_index += 1
+                                elif "colname" in entry["$"]:
+                                    col_num = int(entry["$"]["colname"][3:]) - 1
+                                    content = handle_label(entry)
+                                    row_data[col_num] = content
+                                    col_index = col_num + 1
                                 else:
-                                    # Add empty cells for any skipped columns
-                                    while col_index < (
-                                        int(entry["$"]["colname"][-1]) - 1
-                                        if "colname" in entry["$"]
-                                        else col_index
-                                    ):
-                                        row_data.append("")
-                                        col_index += 1
-
-                                    content = handle_label(entry)
-                                    row_data.append(content)
+                                    row_data[col_index] = handle_label(entry)
                                     col_index += 1
                             else:
-                                content = handle_label(entry)
-                                row_data.append(content)
+                                row_data[col_index] = handle_label(entry)
                                 col_index += 1
 
                 rows.append(row_data)
