@@ -3,6 +3,8 @@ import re
 import json
 from lxml import etree
 
+from sciencedirect2markdown.glyph_match import glyph_match
+
 import streamlit as st
 
 attachment_lookup = {}
@@ -88,6 +90,8 @@ def json_to_markdown(data):
                 markdown_output += handle_hsp(data)
             elif tag_name == "formula":
                 markdown_output += handle_formula(data)
+            elif tag_name == "glyph":
+                markdown_output += handle_glyph(data)
             elif tag_name == "label":
                 markdown_output += handle_label(data)
             elif tag_name == "cross-ref":
@@ -127,7 +131,7 @@ def json_to_markdown(data):
     elif isinstance(data, list):
         for item in data:
             markdown_output += json_to_markdown(item)
-    
+
     markdown_output = handle_post_process(markdown_output)
 
     return markdown_output
@@ -520,8 +524,10 @@ def handle_section(data):
 def handle_section_title(data):
     return "## " + handle_label(data) + "\n\n"
 
+
 def handle_br(data):
     return "\n"
+
 
 def handle_bold(data):
     return f"**{handle_label(data)}**"
@@ -537,14 +543,18 @@ def handle_small_caps(data):
     # then make it small using latex format
     return f"$_{upper}$"
 
+
 def handle_sup(data):
     return f"$^{handle_label(data)}$"
+
 
 def handle_inf(data):
     return f"$_{handle_label(data)}$"
 
+
 def handle_hsp(data):
     return " "
+
 
 # formula
 def handle_formula(data):
@@ -556,6 +566,30 @@ def handle_formula(data):
             id = data["$"]["id"]
             markdown_output += f" [^({id})]"
     return markdown_output
+
+
+def handle_glyph(data):
+    if "$" in data:
+        if "name" in data["$"]:
+            name = data["$"]["name"]
+            if name in glyph_match:
+                filename = glyph_match[name]["fileName"]
+                description = (
+                    glyph_match[name]["description"]
+                    if "description" in glyph_match[name]
+                    else ""
+                )
+                unicode = (
+                    glyph_match[name]["unicode"]
+                    if "unicode" in glyph_match[name]
+                    else None
+                )
+
+                if unicode:
+                    return f"&#x{unicode:x};"
+
+                base_path = "https://sdfestaticassets-us-east-1.sciencedirectassets.com/shared-assets/55/entities/"
+                return f"![{description}]({base_path}{filename})"
 
 
 def handle_label(data):
@@ -662,6 +696,7 @@ def construct_image_url(locator):
     """
     return f"https://ars.els-cdn.com/content/image/{locator}"
 
+
 def handle_post_process(markdown_output):
     """
     Post-processes the Markdown output to fix formatting issues.
@@ -677,7 +712,7 @@ def handle_post_process(markdown_output):
 
     # Remove extra spaces before newlines
     markdown_output = re.sub(r" +\n", "\n", markdown_output)
-    
+
     # remove extra ---
     markdown_output = re.sub(r"\n---\n\n---\n", "\n---\n", markdown_output)
 
