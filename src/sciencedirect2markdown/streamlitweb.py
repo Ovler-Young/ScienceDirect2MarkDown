@@ -735,7 +735,7 @@ def main():
     st.set_page_config(layout="wide")
     colx, coly = st.columns([2, 1])
     with colx:
-        st.title("JSON to Markdown Converter for Elsevier")
+        st.title("JSON to Markdown Converter for Sciencedirect")
     with coly:
         # upload JSON file
         uploaded_file = st.file_uploader(
