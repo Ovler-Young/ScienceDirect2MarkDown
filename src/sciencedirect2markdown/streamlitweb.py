@@ -374,15 +374,17 @@ def handle_tgroup(data):
                 rows = handle_tbody(item)
 
         if header:
-            markdown_output += "|"
-            for i in range(len(header)):
-                markdown_output += header[i] + "|"
-            markdown_output += "\n"
+            for header_row in header:
+                markdown_output += "|"
+                for _, cell in enumerate(header_row):
+                    markdown_output += cell + "|"
+                markdown_output += "\n"
 
-            markdown_output += "|"
-            for i in range(len(header)):
-                markdown_output += "---|"
-            markdown_output += "\n"
+                # Add separator row after each header row
+                markdown_output += "|"
+                for i in range(len(header_row)):
+                    markdown_output += "---|"
+                markdown_output += "\n"
 
         if rows:
             for row in rows:
@@ -715,13 +717,13 @@ def main():
             label_visibility="collapsed",
             help="Upload a JSON file to convert to Markdown.",
         )
-        
+
         colm, coln = st.columns(2)
         with colm:
             convert = st.button("Convert")
         with coln:
             hide_original = st.checkbox("Hide Raw Markdown", value=True)
-    
+
     # Input JSON data
     json_data = st.text_area(
         "Upload JSON data at the top, or paste it here.",
