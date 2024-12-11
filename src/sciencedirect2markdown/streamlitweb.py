@@ -74,6 +74,8 @@ def json_to_markdown(data):
                 markdown_output += handle_bold(data)
             elif tag_name == "italic":
                 markdown_output += handle_italic(data)
+            elif tag_name == "small-caps":
+                markdown_output += handle_small_caps(data)
             elif tag_name == "label":
                 markdown_output += handle_label(data)
             elif tag_name == "cross-ref":
@@ -511,6 +513,12 @@ def handle_bold(data):
 
 def handle_italic(data):
     return f"*{handle_label(data)}*"
+
+def handle_small_caps(data):
+    # Small caps are not supported in Markdown, so we convert them to uppercase
+    upper = handle_label(data).upper()
+    # then make it small using latex format
+    return f"$_{upper}$"
 
 
 def handle_label(data):
