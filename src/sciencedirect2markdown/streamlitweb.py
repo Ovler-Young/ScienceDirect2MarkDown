@@ -101,6 +101,7 @@ def json_to_markdown(data):
                     markdown_output += handle_label(data)
                 if "$$" in data:
                     markdown_output += json_to_markdown(data["$$"])
+                print(f"Unhandled tag: {tag_name} - {data}")
 
         elif "content" in data:
             markdown_output += json_to_markdown(data["content"])
