@@ -514,11 +514,13 @@ def handle_italic(data):
 
 
 def handle_label(data):
+    _data = ""
+    subdata = ""
     if "_" in data:
-        return data["_"]
-    elif "$$" in data:
-        return json_to_markdown(data["$$"])
-    return ""
+        _data = data["_"]
+    if "$$" in data:
+        subdata = json_to_markdown(data["$$"])
+    return _data + subdata
 
 
 def handle_cross_ref(data):
