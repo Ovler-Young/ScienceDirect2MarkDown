@@ -516,6 +516,8 @@ def handle_italic(data):
 def handle_label(data):
     if "_" in data:
         return data["_"]
+    elif "$$" in data:
+        return json_to_markdown(data["$$"])
     return ""
 
 
