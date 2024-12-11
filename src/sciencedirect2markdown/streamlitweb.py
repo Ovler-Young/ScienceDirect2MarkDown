@@ -439,20 +439,7 @@ def handle_tbody(data):
                                         row_data.append("")
                                         col_index += 1
 
-                                    if "$$" in entry:
-                                        for sub_item in entry["$$"]:
-                                            if sub_item["#name"] == "italic":
-                                                content += handle_italic(sub_item)
-                                            elif sub_item["#name"] == "hsp":
-                                                content += " "  # Add a non-breaking space for hsp
-                                            elif sub_item["#name"] == "__text__":
-                                                content += sub_item["_"]
-                                            else:
-                                                content += json_to_markdown(sub_item)
-                                    else:
-                                        content = (
-                                            handle_label(entry) if "_" in entry else ""
-                                        )
+                                    content = handle_label(entry)
 
                                     row_data.append(content)
                                     col_index += 1
@@ -471,37 +458,11 @@ def handle_tbody(data):
                                         row_data.append("")
                                         col_index += 1
 
-                                    if "$$" in entry:
-                                        for sub_item in entry["$$"]:
-                                            if sub_item["#name"] == "italic":
-                                                content += handle_italic(sub_item)
-                                            elif sub_item["#name"] == "hsp":
-                                                content += " "  # Add a non-breaking space for hsp
-                                            elif sub_item["#name"] == "__text__":
-                                                content += sub_item["_"]
-                                            else:
-                                                content += json_to_markdown(sub_item)
-                                    else:
-                                        content = (
-                                            handle_label(entry) if "_" in entry else ""
-                                        )
+                                    content = handle_label(entry)
                                     row_data.append(content)
                                     col_index += 1
-                            else:  # Handle cases where "$" is not present in entry
-                                if "$$" in entry:
-                                    for sub_item in entry["$$"]:
-                                        if sub_item["#name"] == "italic":
-                                            content += handle_italic(sub_item)
-                                        elif sub_item["#name"] == "hsp":
-                                            content += " "
-                                        elif sub_item["#name"] == "__text__":
-                                            content += sub_item["_"]
                                         else:
-                                            content += json_to_markdown(sub_item)
-                                else:
-                                    content = (
-                                        handle_label(entry) if "_" in entry else ""
-                                    )
+                                content = handle_label(entry)
                                 row_data.append(content)
                                 col_index += 1
 
