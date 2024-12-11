@@ -117,6 +117,8 @@ def json_to_markdown(data):
     elif isinstance(data, list):
         for item in data:
             markdown_output += json_to_markdown(item)
+    
+    markdown_output = handle_post_process(markdown_output)
 
     return markdown_output
 
@@ -209,8 +211,6 @@ def handle_list(data, level=0):
                 markdown_output += handle_list(item, level + 1)
 
     markdown_output += "\n"
-
-    markdown_output = markdown_output.replace("\n\n\n", "\n\n")
 
     return markdown_output
 
@@ -504,7 +504,7 @@ def handle_outline(data):
 
 
 def handle_section(data):
-    return f"/n/n---/n/n{json_to_markdown(data)}/n/n---/n/n"
+    return f"\n\n---\n\n{handle_label(data)}\n\n---\n\n"
 
 
 def handle_section_title(data):
@@ -629,6 +629,27 @@ def construct_image_url(locator):
         The constructed image URL.
     """
     return f"https://ars.els-cdn.com/content/image/{locator}"
+
+def handle_post_process(markdown_output):
+    """
+    Post-processes the Markdown output to fix formatting issues.
+
+    Args:
+        markdown_output: The Markdown output to post-process.
+
+    Returns:
+        The post-processed Markdown output.
+    """
+    # Remove extra newlines
+    markdown_output = re.sub(r"\n{3,}", "\n\n", markdown_output)
+
+    # Remove extra spaces before newlines
+    markdown_output = re.sub(r" +\n", "\n", markdown_output)
+    
+    # remove extra ---
+    markdown_output = re.sub(r"\n---\n\n---\n", "\n---\n", markdown_output)
+
+    return markdown_output
 
 
 def remove_trailing_commas(json_string):
