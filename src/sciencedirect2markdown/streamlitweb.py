@@ -327,10 +327,7 @@ def handle_figure(data):
                         image_url = construct_image_url(attachment_eid)
 
     if image_url:
-        if caption or label:
-            caption = caption.replace("\n", " ")
-            label = label.replace("\n", " ")
-        markdown_output += f"![{label + "." if label else ''}{' ' + caption if caption else ''}]({image_url})\n\n"
+        markdown_output += f"![{label.replace("\n", " ") + "." if label else ''}{' ' + caption.replace("\n", " ") if caption else ''}]({image_url})\n\n"
         if caption or label:
             markdown_output += f"*{label + "." if label else ''}{' ' + caption if caption else ''}*\n\n"
 
