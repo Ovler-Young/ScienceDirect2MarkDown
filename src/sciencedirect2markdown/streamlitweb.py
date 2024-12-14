@@ -12,7 +12,7 @@ floats = {}
 processed_floats = set()
 
 
-def json_to_markdown(data):
+def json_to_markdown(data, LaTeX=False):
     """
     Converts the given JSON data to Markdown.
 
@@ -77,9 +77,9 @@ def json_to_markdown(data):
             elif tag_name == "br":
                 markdown_output += handle_br(data)
             elif tag_name == "bold":
-                markdown_output += handle_bold(data)
+                markdown_output += handle_bold(data, LaTeX)
             elif tag_name == "italic":
-                markdown_output += handle_italic(data)
+                markdown_output += handle_italic(data, LaTeX)
             elif tag_name == "small-caps":
                 markdown_output += handle_small_caps(data)
             elif tag_name == "sup":
@@ -549,27 +549,31 @@ def handle_br(data):
     return "<br>"
 
 
-def handle_bold(data):
-    return f"**{handle_label(data)}**"
+def handle_bold(data, LaTeX=False):
+    if not LaTeX:
+        return f"**{handle_label(data)}**"
+    return f"\\textbf{{{handle_label(data, LaTeX)}}}"
 
 
-def handle_italic(data):
-    return f"*{handle_label(data)}*"
+def handle_italic(data, LaTeX=False):
+    if not LaTeX:
+        return f"*{handle_label(data)}*"
+    return f"\\textit{{{handle_label(data, LaTeX)}}}"
 
 
 def handle_small_caps(data):
     # Small caps are not supported in Markdown, so we convert them to uppercase
-    upper = handle_label(data).upper()
+    upper = handle_label(data, LaTeX=True).upper()
     # then make it small using latex format
     return "$_{" + upper + "}$"
 
 
 def handle_sup(data):
-    return "$^{" + handle_label(data) + "}$"
+    return "$^{" + handle_label(data, LaTeX=True) + "}$"
 
 
 def handle_inf(data):
-    text = handle_label(data)
+    text = handle_label(data, LaTeX=True)
     # we need to add many / when special characters can come
     if "$" in data:
         loc = data["$"]["loc"]
@@ -623,14 +627,14 @@ def handle_glyph(data):
                 return f"![{description}]({base_path}{filename})"
 
 
-def handle_label(data):
+def handle_label(data: dict, LaTeX=False):
     _data = ""
     subdata = ""
     if "_" in data:
         _data = data["_"]
     if "$$" in data:
         for item in data["$$"]:
-            subdata += json_to_markdown(item)
+            subdata += json_to_markdown(item, LaTeX)
     return _data + subdata
 
 
@@ -811,9 +815,12 @@ def main():
         st.header("Markdown Output")
     with colb:
         with colm:
+            default_filename = "converted_markdown.md"
+            if uploaded_file:
+                default_filename = uploaded_file.name.replace(".json", ".md")
             title_input = st.text_input(
                 "Title",
-                "converted_markdown.md",
+                value=default_filename,
                 label_visibility="collapsed",
             )
         with coln:
@@ -824,15 +831,6 @@ def main():
                 file_name=title_input,
                 mime="text/markdown",
             )
-
-    if hide_original:
-        st.markdown(markdown_output, unsafe_allow_html=True)
-    else:
-        with cola:
-            st.markdown(markdown_output, unsafe_allow_html=True)
-        with colb:
-            st.header("Markdown Output Raw")
-            st.markdown(f"```markdown\n{markdown_output}\n```")
 
 
 if __name__ == "__main__":
