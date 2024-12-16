@@ -1,6 +1,8 @@
 import os
 import re
 import json
+from io import BytesIO
+import zipfile
 from lxml import etree
 
 from sciencedirect2markdown.glyph_match import glyph_match
@@ -762,6 +764,46 @@ def remove_trailing_commas(json_string):
     return cleaned_json_string
 
 
+def batch_process_files(files):
+    """
+    Batch process multiple JSON files and return a dict of markdown outputs.
+    
+    Args:
+        files: List of uploaded files
+    Returns:
+        Dict with filename as key and markdown content as value
+    """
+    results = {}
+    for file in files:
+        try:
+            json_data = file.read().decode("utf-8")
+            cleaned_json_data = remove_trailing_commas(json_data)
+            data = json.loads(cleaned_json_data)
+            markdown_output = json_to_markdown(data)
+            filename = file.name.replace(".json", ".md")
+            results[filename] = markdown_output
+        except Exception as e:
+            results[f"{file.name}.error"] = str(e)
+    return results
+
+
+def create_zip_download(markdown_files):
+    """
+    Create a ZIP file containing all markdown files.
+    
+    Args:
+        markdown_files: Dict with filename as key and content as value
+    Returns:
+        BytesIO object containing the ZIP file
+    """
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for filename, content in markdown_files.items():
+            zip_file.writestr(filename, content)
+    zip_buffer.seek(0)
+    return zip_buffer
+
+
 # Entry point for Streamlit app
 def main():
     st.set_page_config(layout="wide")
@@ -774,12 +816,13 @@ def main():
             """
         )
     with coly:
-        # upload JSON file
-        uploaded_file = st.file_uploader(
-            "Upload JSON file",
+        # upload JSON files
+        uploaded_files = st.file_uploader(
+            "Upload JSON files",
             type=["json"],
+            accept_multiple_files=True,
             label_visibility="collapsed",
-            help="Upload a JSON file to convert to Markdown.",
+            help="Upload one or more JSON files to convert to Markdown.",
         )
 
         colm, coln = st.columns(2)
@@ -788,49 +831,60 @@ def main():
         with coln:
             hide_original = st.checkbox("Hide Raw Markdown", value=True)
 
-    # Input JSON data
+    # Text input area for single file processing
     json_data = st.text_area(
-        "Upload JSON data at the top, or paste it here.",
+        "Upload JSON files at the top, or paste single JSON data here.",
         placeholder="Paste JSON data here...",
     )
-
-    cola, colb = st.columns(2)
 
     if not convert:
         st.stop()
 
     try:
-        if uploaded_file:
-            json_data = uploaded_file.read().decode("utf-8")
-        cleaned_json_data = remove_trailing_commas(json_data)
-        data = json.loads(cleaned_json_data)
-        markdown_output = json_to_markdown(data)
+        results = {}
+        
+        # Process uploaded files if any
+        if uploaded_files:
+            results = batch_process_files(uploaded_files)
+            
+            # Create ZIP download if multiple files
+            if len(results) > 1:
+                zip_buffer = create_zip_download(results)
+                st.download_button(
+                    label="Download All as ZIP",
+                    data=zip_buffer,
+                    file_name="converted_markdown_files.zip",
+                    mime="application/zip"
+                )
+        
+        # Process pasted JSON if no files uploaded
+        elif json_data:
+            cleaned_json_data = remove_trailing_commas(json_data)
+            data = json.loads(cleaned_json_data)
+            markdown_output = json_to_markdown(data)
+            results["converted_markdown.md"] = markdown_output
+
+        # Display results
+        if results:
+            for filename, content in results.items():
+                if filename.endswith(".error"):
+                    st.error(f"Error processing {filename[:-6]}:\n{content}")
+                else:
+                    with st.expander(f"Preview: {filename}"):
+                        st.markdown(content)
+                        st.download_button(
+                            label=f"Download {filename}",
+                            data=content.encode("utf-8"),
+                            file_name=filename,
+                            mime="text/markdown",
+                            key=filename
+                        )
+
     except json.JSONDecodeError:
         st.error("Invalid JSON format. Please check your input.")
     except Exception as e:
         st.error(f"An error occurred: {e.__cause__}")
         st.exception(e)
-
-    with cola:
-        st.header("Markdown Output")
-    with colb:
-        with colm:
-            default_filename = "converted_markdown.md"
-            if uploaded_file:
-                default_filename = uploaded_file.name.replace(".json", ".md")
-            title_input = st.text_input(
-                "Title",
-                value=default_filename,
-                label_visibility="collapsed",
-            )
-        with coln:
-            # Download button
-            st.download_button(
-                label="Download Markdown",
-                data=markdown_output.encode("utf-8"),
-                file_name=title_input,
-                mime="text/markdown",
-            )
 
 
 if __name__ == "__main__":
