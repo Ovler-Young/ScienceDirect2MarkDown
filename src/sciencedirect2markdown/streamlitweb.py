@@ -259,7 +259,7 @@ def handle_math(data):
         return ""
 
     mathml_content = convert_json_to_mathml(data)
-    
+
     try:
         latex_string = mathml2latex_yarosh(mathml_content)
     except:
@@ -767,7 +767,7 @@ def remove_trailing_commas(json_string):
 def batch_process_files(files):
     """
     Batch process multiple JSON files and return a dict of markdown outputs.
-    
+
     Args:
         files: List of uploaded files
     Returns:
@@ -790,7 +790,7 @@ def batch_process_files(files):
 def create_zip_download(markdown_files):
     """
     Create a ZIP file containing all markdown files.
-    
+
     Args:
         markdown_files: Dict with filename as key and content as value
     Returns:
@@ -842,11 +842,11 @@ def main():
 
     try:
         results = {}
-        
+
         # Process uploaded files if any
         if uploaded_files:
             results = batch_process_files(uploaded_files)
-            
+
             # Create ZIP download if multiple files
             if len(results) > 1:
                 zip_buffer = create_zip_download(results)
@@ -854,9 +854,9 @@ def main():
                     label="Download All as ZIP",
                     data=zip_buffer,
                     file_name="converted_markdown_files.zip",
-                    mime="application/zip"
+                    mime="application/zip",
                 )
-        
+
         # Process pasted JSON if no files uploaded
         elif json_data:
             cleaned_json_data = remove_trailing_commas(json_data)
@@ -870,14 +870,21 @@ def main():
                 if filename.endswith(".error"):
                     st.error(f"Error processing {filename[:-6]}:\n{content}")
                 else:
-                    with st.expander(f"Preview: {filename}"):
-                        st.markdown(content)
+                    with st.expander(f"Preview: {filename}", expanded=False):
+                        # Only show download button if hidden
+                        if hide_original:
+                            st.info(
+                                "Preview hidden to save memory. Click download to view content."
+                            )
+                        else:
+                            st.markdown(content)
+
                         st.download_button(
                             label=f"Download {filename}",
                             data=content.encode("utf-8"),
                             file_name=filename,
                             mime="text/markdown",
-                            key=filename
+                            key=filename,
                         )
 
     except json.JSONDecodeError:
