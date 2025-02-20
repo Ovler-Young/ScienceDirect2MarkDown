@@ -5,7 +5,7 @@ from io import BytesIO
 import zipfile
 from lxml import etree
 
-from sciencedirect2markdown.glyph_match import glyph_match
+import glyph_match
 
 import streamlit as st
 
@@ -329,9 +329,18 @@ def handle_figure(data):
                         image_url = construct_image_url(attachment_eid)
 
     if image_url:
-        markdown_output += f"![{label.replace("\n", " ") + "." if label else ''}{' ' + caption.replace("\n", " ") if caption else ''}]({image_url})\n\n"
         if caption or label:
-            markdown_output += f"*{label + "." if label else ''}{' ' + caption if caption else ''}*\n\n"
+            clean_label = label.replace('\n', ' ').strip() if label else ''
+            clean_caption = caption.replace('\n', ' ').strip() if caption else ''
+    
+            # Build the image text parts
+            label_part = f"{clean_label}."
+            caption_part = f" {clean_caption}"
+    
+        # markdown_output += f'![{label.replace('\n', ' ') + '.' if label else ''}{' ' + caption.replace('\n', ' ') if caption else ''}]({image_url})'
+        markdown_output += f"![{label_part}{caption_part}]({image_url})\n\n"
+        if caption or label:
+            markdown_output += f"*{label_part}{caption_part}*\n\n"
 
     return markdown_output
 
