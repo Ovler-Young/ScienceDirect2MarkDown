@@ -329,6 +329,8 @@ def handle_figure(data):
                         image_url = construct_image_url(attachment_eid)
 
     if image_url:
+        label_part = ""
+        caption_part = ""
         if caption or label:
             clean_label = label.replace('\n', ' ').strip() if label else ''
             clean_caption = caption.replace('\n', ' ').strip() if caption else ''
